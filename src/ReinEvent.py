@@ -54,8 +54,12 @@ def grabFMCode(client):
     FMCode = 0
     '''
     #go through the buildings table
-    fields = client.sql('select * from buildings')
-    print fields
+
+    try:
+        fields = client.sql('select * from buildings')
+        print fields['rows']
+    except cartodb.CartoDBException as e:
+            print ("some error occurred", e)
     '''
     num = len(fields['rows'])
     
@@ -161,7 +165,7 @@ def main():
 
     #user information
     user = "smithgis@smith.edu"
-    api_key = "559651a7eb7bfa39b60a7160859432749e92b8fda"
+    api_key = "59651a7eb7bfa39b60a7160859432749e92b8fda"
     cartodb_domain = "smithgis"
         
     #initialize CartoDB client to deal with SQL commands
