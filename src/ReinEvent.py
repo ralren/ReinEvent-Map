@@ -45,39 +45,29 @@ def insert_events():
         client, the required URL to manipulate the sql
 @return FMCode, the FMCode of a particular event
 '''
-def grabFMCode(client):
+def grabFMDictionary(client):
     '''
     #initalize variables
     keyword = keywords[0]
-    cbIDs = {} #potential CartoDB IDs
-    cbID = 0 #the actual CartoDB ID
-    FMCode = 0
     '''
+    buildFM = {}
+
     #go through the buildings table
 
     try:
         fields = client.sql('select * from buildings')
-        print fields['rows']
     except cartodb.CartoDBException as e:
             print ("some error occurred", e)
-    '''
-    num = len(fields['rows'])
     
+    num = len(fields['rows'])
     
     #go through each row within the buildings table
     for n in range(0,num):
-        name = fields['rows'][n]['bldg_name']
+        buildName = fields['rows'][n]['bldg_name']
+        FMCode = fields['rows'][n]['fmcode']
+        buildFM[buildName] = FMCode
     
-        if keyword in name:
-            cbIDs[name] = fields['rows'][n]['cartodb_id']
-      
-  
-    #narrow down what the cbID is
-    if len(cbIDs) > 1:
-        keyword = keywords[1]
-        for bldg, cb in cbIDs.iteritems():
-            if keyword in bldg:
-                cbID = cb
+    '''
     #some of the buildings are within another building so just assign them the same cartodb ID
     elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
         cbID = 86
@@ -91,14 +81,8 @@ def grabFMCode(client):
     else:
         for cb in cbIDs.itervalues():
             cbID = cb
-    
-    
-    sqlcomm = 'SELECT {0}, ST_X(ST_Centroid(the_geom)), ST_Y(ST_Centroid(the_geom)) FROM buildings'.format(cbID)
-    pt = client.sql(sqlcomm)
-    point.append(pt['rows'][cbID]['st_x'] + random.uniform(0, .0003))
-    point.append(pt['rows'][cbID]['st_y'] + random.uniform(0, .0003))
-    return point
     '''
+    return buildFM
 
 '''
 @summary: Create a dictionary which will hold the events and their values
@@ -170,7 +154,7 @@ def main():
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    grabFMCode(cl)
+    FMDictionary = grabFMDictionary(cl)
 
 
 #calls the main function upon importing module
