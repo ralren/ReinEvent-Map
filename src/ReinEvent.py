@@ -88,7 +88,7 @@ def grabFMDictionary(client):
 @summary: Create a dictionary which will hold the events and their values
 @params: 
 '''
-def parse_events():
+def parse_events(FMDictionary):
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
     events = {} #holds the events PROBABLY CHANGE INTO A LIST
@@ -125,10 +125,40 @@ def parse_events():
             else:
                 e.name = entry.title
                 
-            #add other information
+            #format location
             location = description[0] 
             e.location = location
             
+            #format fmcode
+            buildingName = ""
+            possibleBuildings = []
+            keywords = location.split() # split the location name so we can isolate the building name
+                    
+            for building in FMDictionary.keys():
+                if keywords[0] in building:
+                    possibleBuildings.append(building)
+            
+            if possibleBuildings.length() < 1:
+                for possibility in possibleBuildings:
+                    if keywords[1] in possibility:
+                        buildingName = possibility
+                        
+            #some of the buildings are within another building so just assign them the same cartodb ID
+            elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
+                buildingName = "Sage Hall"
+            elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
+                buildingName = "Wright Hall"
+            elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
+                buildingName = "Mendenhall Center for Performing Arts"
+            elif (keywords[0] == "BFAC"):
+                buildingName = "Fine Arts Center"
+            #only one code so get it
+            else:
+                buildingName = possibleBuildings[0]
+                
+            fmcode = FMDictionary[buildingName] #look up fmcode using the building name and FMCodedictionary
+            e.FMCode = fmcode
+                        
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
@@ -138,10 +168,8 @@ def parse_events():
             time = date_time[1].split    
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
             e.time = times[0] + " - " + times[1] #concatenate strings with the time    
-    
-            #add FMCode :D
-            #e.FMCode = grabFMCode(location.split, cl)
-        
+    return events    
+            
 '''
 @summary: Initializes user data and create the CartoDB client to manipulate tables within.
 '''
@@ -155,7 +183,7 @@ def main():
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
     FMDictionary = grabFMDictionary(cl)
-
+    parse_events(FMDictionary)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
