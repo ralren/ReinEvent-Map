@@ -67,21 +67,6 @@ def grabFMDictionary(client):
         FMCode = fields['rows'][n]['fmcode']
         buildFM[buildName] = FMCode
     
-    '''
-    #some of the buildings are within another building so just assign them the same cartodb ID
-    elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
-        cbID = 86
-    elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
-        cbID = 97
-    elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
-        cbID = 18
-    elif (keywords[0] == "BFAC"):
-        cbID = 5
-    #only one code so get it
-    else:
-        for cb in cbIDs.itervalues():
-            cbID = cb
-    '''
     return buildFM
 
 '''
