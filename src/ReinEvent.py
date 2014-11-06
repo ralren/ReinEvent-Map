@@ -90,8 +90,8 @@ def parse_events(FMDictionary):
         #check if the event is within the events dictionary already
         without = True
         for event in events:
-            #does it have the title (entry.title), location (description[0]), and time/date as the same thing?
-            if (event[0] == entry.title) and (event[1] == description[0]) and (event[2] == description[1].split("&",2)[0]):
+            #does it have the title (entry.title) and location (description[0]) as the same thing?
+            if (event.name == entry.title) and (event.location == description[0]):
                 without = False
                 
         if without: #if event isn't already within the dictionary, put it in the dictionary
@@ -114,12 +114,16 @@ def parse_events(FMDictionary):
             buildingName = ""
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
+            print keywords
                     
             for building in FMDictionary.keys():
                 if keywords[0] in building:
+                    print keywords[0]
+                    print building
                     possibleBuildings.append(building)
             
-            if possibleBuildings.length() < 1:
+            print len(possibleBuildings)
+            if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
                         buildingName = possibility
@@ -131,8 +135,10 @@ def parse_events(FMDictionary):
                 buildingName = "Wright Hall"
             elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
                 buildingName = "Mendenhall Center for Performing Arts"
-            elif (keywords[0] == "BFAC"):
+            elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
                 buildingName = "Fine Arts Center"
+            elif (keywords[0] == "Quad"):
+                buildingName = "Morrow House"
             #only one code so get it
             else:
                 buildingName = possibleBuildings[0]
@@ -145,7 +151,7 @@ def parse_events(FMDictionary):
             date = date_time[0]
             
             #format time
-            time = date_time[1].split    
+            time = date_time[1].split()
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
             time = times[0] + " - " + times[1] #concatenate strings with the time    
 
