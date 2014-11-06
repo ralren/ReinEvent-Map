@@ -57,7 +57,7 @@ def grabFMDictionary(client):
     try:
         fields = client.sql('select * from buildings')
     except cartodb.CartoDBException as e:
-            print ("some error occurred", e)
+        print ("some error occurred", e)
     
     num = len(fields['rows'])
     
@@ -106,13 +106,12 @@ def parse_events(FMDictionary):
                     if (letter != "'") and (letter != "\""):
                         title += letter
             
-                e.name = title
+                name = title
             else:
-                e.name = entry.title
+                name = title
                 
             #format location
             location = description[0] 
-            e.location = location
             
             #format fmcode
             buildingName = ""
@@ -142,17 +141,17 @@ def parse_events(FMDictionary):
                 buildingName = possibleBuildings[0]
                 
             fmcode = FMDictionary[buildingName] #look up fmcode using the building name and FMCodedictionary
-            e.FMCode = fmcode
                         
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
-            e.date = date_time[0]
+            date = date_time[0]
             
             #format time
             time = date_time[1].split    
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
-            e.time = times[0] + " - " + times[1] #concatenate strings with the time    
+            time = times[0] + " - " + times[1] #concatenate strings with the time    
+
     return events    
             
 '''
