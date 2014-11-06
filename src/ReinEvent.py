@@ -106,7 +106,10 @@ def parse_events(FMDictionary):
                 name = title
             else:
                 name = entry.title
-                
+            '''
+            Sometimes there's an exception where an event doesn't have a location, thus no FMCode, and has the date and time of the event in the
+            description. 
+            '''
             #format location
             location = description[0] 
             
@@ -145,6 +148,9 @@ def parse_events(FMDictionary):
                 
             fmcode = FMDictionary[buildingName] #look up fmcode using the building name and FMCodedictionary
                         
+            '''
+            Possibly grab date and time from <pubdate> field rather than description[1]
+            '''
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
