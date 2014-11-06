@@ -76,7 +76,7 @@ def grabFMDictionary(client):
 def parse_events(FMDictionary):
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
-    events = {} #holds the events PROBABLY CHANGE INTO A LIST
+    events = [] #holds the events PROBABLY CHANGE INTO A LIST
     count = 0 #keeps track of how many events there are
     
     #parse through each event in the RSS feed
@@ -89,15 +89,12 @@ def parse_events(FMDictionary):
         
         #check if the event is within the events dictionary already
         without = True
-        for event in events.itervalues():
+        for event in events:
             #does it have the title (entry.title), location (description[0]), and time/date as the same thing?
             if (event[0] == entry.title) and (event[1] == description[0]) and (event[2] == description[1].split("&",2)[0]):
                 without = False
                 
         if without: #if event isn't already within the dictionary, put it in the dictionary
-            
-            #create an Event object
-            e = Event()
             
             #remove quotation marks in title because it creates conflict
             if ("\'" in entry.title) or ("\"" in entry.title):
@@ -108,7 +105,7 @@ def parse_events(FMDictionary):
             
                 name = title
             else:
-                name = title
+                name = entry.title
                 
             #format location
             location = description[0] 
@@ -152,6 +149,9 @@ def parse_events(FMDictionary):
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
             time = times[0] + " - " + times[1] #concatenate strings with the time    
 
+            #create an Event object
+            e = Event(name, location, fmcode, time, date)
+            events.append(e)
     return events    
             
 '''
