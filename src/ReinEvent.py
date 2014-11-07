@@ -63,9 +63,9 @@ def grabFMDictionary(client):
     
     #go through each row within the buildings table
     for n in range(0,num):
-        buildName = fields['rows'][n]['bldg_name']
+        building_name = fields['rows'][n]['bldg_name']
         FMCode = fields['rows'][n]['fmcode']
-        buildFM[buildName] = FMCode
+        buildFM[building_name] = FMCode
     
     return buildFM
 
@@ -114,7 +114,7 @@ def parse_events(FMDictionary):
             location = description[0] 
             
             #format fmcode
-            buildingName = ""
+            building_name = ""
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
             print keywords
@@ -129,24 +129,32 @@ def parse_events(FMDictionary):
             if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
-                        buildingName = possibility
+                        building_name = possibility
+                        
+            ''' EXCEPTIONS TO WORK ON
+                
+                NO LOCATION
+                
+                LOCATIONS THAT WORK AREN'T IN THE BUILDINGS TABLE (EX. THE QUAD)
+                //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
+            ''' 
                         
             #some of the buildings are within another building so just assign them the same cartodb ID
             elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
-                buildingName = "Sage Hall"
+                building_name = "Sage Hall"
             elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
-                buildingName = "Wright Hall"
+                building_name = "Wright Hall"
             elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
-                buildingName = "Mendenhall Center for Performing Arts"
+                building_name = "Mendenhall Center for Performing Arts"
             elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
-                buildingName = "Fine Arts Center"
+                building_name = "Fine Arts Center"
             elif (keywords[0] == "Quad"):
-                buildingName = "Morrow House"
+                building_name = "Morrow House"
             #only one code so get it
             else:
-                buildingName = possibleBuildings[0]
+                building_name = possibleBuildings[0]
                 
-            fmcode = FMDictionary[buildingName] #look up fmcode using the building name and FMCodedictionary
+            fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
                         
             '''
             Possibly grab date and time from <pubdate> field rather than description[1]
