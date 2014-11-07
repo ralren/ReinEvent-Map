@@ -90,8 +90,8 @@ def parse_events(FMDictionary):
         #check if the event is within the events dictionary already
         without = True
         for event in events:
-            #does it have the title (entry.title), location (description[0]), and time/date as the same thing?
-            if (event[0] == entry.title) and (event[1] == description[0]) and (event[2] == description[1].split("&",2)[0]):
+            #does it have the title (entry.title) and location (description[0]) as the same thing?
+            if (event.name == entry.title) and (event.location == description[0]):
                 without = False
                 
         if without: #if event isn't already within the dictionary, put it in the dictionary
@@ -106,7 +106,10 @@ def parse_events(FMDictionary):
                 name = title
             else:
                 name = entry.title
-                
+            '''
+            Sometimes there's an exception where an event doesn't have a location, thus no FMCode, and has the date and time of the event in the
+            description. 
+            '''
             #format location
             location = description[0] 
             
@@ -114,17 +117,19 @@ def parse_events(FMDictionary):
             building_name = ""
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
+            print keywords
                     
             for building in FMDictionary.keys():
                 if keywords[0] in building:
+                    print keywords[0]
+                    print building
                     possibleBuildings.append(building)
             
-            if possibleBuildings.length() < 1:
+            print len(possibleBuildings)
+            if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
                         building_name = possibility
-                        
-                        
                         
             ''' EXCEPTIONS TO WORK ON
                 
@@ -132,7 +137,7 @@ def parse_events(FMDictionary):
                 
                 LOCATIONS THAT WORK AREN'T IN THE BUILDINGS TABLE (EX. THE QUAD)
                 //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
-            '''
+            ''' 
                         
             #some of the buildings are within another building so just assign them the same cartodb ID
             elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
@@ -141,21 +146,26 @@ def parse_events(FMDictionary):
                 building_name = "Wright Hall"
             elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
                 building_name = "Mendenhall Center for Performing Arts"
-            elif (keywords[0] == "BFAC"):
+            elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
                 building_name = "Fine Arts Center"
+            elif (keywords[0] == "Quad"):
+                building_name = "Morrow House"
             #only one code so get it
             else:
                 building_name = possibleBuildings[0]
                 
             fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
                         
+            '''
+            Possibly grab date and time from <pubdate> field rather than description[1]
+            '''
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
             date = date_time[0]
             
             #format time
-            time = date_time[1].split    
+            time = date_time[1].split()
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
             time = times[0] + " - " + times[1] #concatenate strings with the time    
 
