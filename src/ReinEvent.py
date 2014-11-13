@@ -124,12 +124,7 @@ def parse_events(FMDictionary):
                     
             for building in FMDictionary.keys():
                 if keywords[0] in building:
-                    print keywords[0]
-                    print building
-                    possibleBuildings.append(building)
-            
-            # print len(possibleBuildings)
-            
+                    possibleBuildings.append(building)            
             
             ''' EXCEPTIONS TO WORK ON
                 
@@ -181,6 +176,7 @@ def parse_events(FMDictionary):
                             #create an Event object
                             e = Event(name, location, fmcode, time, date)
                             events.append(e)
+                            print e
                         except KeyError:                        
                             butts = 5
     return events    
