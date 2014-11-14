@@ -5,7 +5,6 @@ Created on Oct 28, 2014
 @description: This class is used to store event data from the Smith College events calendar to be mapped later on.
 '''
 import feedparser
-import random
 import cartodb
 
 ''' START THIS CLASS!
@@ -60,7 +59,7 @@ def grabFMDictionary(client):
         fields = client.sql('select * from buildings')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
-    
+     
     num = len(fields['rows'])
     
     #go through each row within the buildings table
@@ -172,7 +171,7 @@ def parse_events(FMDictionary):
                             time = date_time[1].split()
                             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
                             time = times[0] + " - " + times[1] #concatenate strings with the time    
-                
+            
                             #create an Event object
                             e = Event(name, location, fmcode, time, date)
                             events.append(e)
