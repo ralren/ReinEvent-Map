@@ -69,6 +69,12 @@ def grab_FMDict(client):
 @return: events, list of events
 '''
 def parse_events(FM_Dict):
+    
+    # variables to count events
+    events_dropped = 0
+    events_added = 0
+    total_events = 0 # should be events_dropped + events_added. to account for any errors
+    
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
     events = [] #list that holds the events
@@ -112,6 +118,7 @@ def parse_events(FM_Dict):
             keywords = location.split() # split the location name so we can isolate the building name
             
             print "EVENT NAME: " + name
+            total_events += 1
             # loops through all building names to determine which one the event is located at        
             for building in FM_Dict.keys():
                 if keywords[0] in building:
@@ -193,14 +200,28 @@ def parse_events(FM_Dict):
                 #create an Event object
                 e = Event(name, location, fmcode, time, date)
                 events.append(e)
+                events_added+=1
                 print e.name + " has been added to the list of events"
-                print e.name + "'s" + " location: " + building_name
+                print e.name + "'s" + " loca: " + building_name
+                print e.name + "'s" + " time: " + e.time
+                print e.name + "'s" + " date: " + e.date
                 print
                 #print e.name
             except KeyError:    
                 # can't match the event, just keep going                   
                 print "could not resolve event: " + name
                 print
+                events_dropped+=1
+                
+    print
+    print "Finished parsing..."            
+    print "Number of events added: "
+    print events_added
+    print "Number of events dropped: "
+    print events_dropped
+    print "Total number of events parsed: "
+    print total_events   
+     
     return events    
             
 '''
