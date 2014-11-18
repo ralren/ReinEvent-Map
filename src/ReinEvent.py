@@ -5,7 +5,6 @@ Created on Oct 28, 2014
 @description: This class is used to store event data from the Smith College events calendar to be mapped later on.
 '''
 import feedparser
-import random
 import cartodb
 
 ''' START THIS CLASS!
@@ -28,6 +27,8 @@ class Event:
         self.time = time
         self.date = date
 ''' CLASS OVER '''   
+
+
 
 '''
 @summary: Insert the data into the CartoDB account
@@ -58,7 +59,7 @@ def grabFMDictionary(client):
         fields = client.sql('select * from buildings')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
-    
+     
     num = len(fields['rows'])
     
     #go through each row within the buildings table
@@ -76,8 +77,7 @@ def grabFMDictionary(client):
 def parse_events(FMDictionary):
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
-    events = [] #holds the events PROBABLY CHANGE INTO A LIST
-    count = 0 #keeps track of how many events there are
+    events = [] #holds the events
     
     #parse through each event in the RSS feed
     for entry in calendar.entries:
@@ -85,17 +85,17 @@ def parse_events(FMDictionary):
         #fix any unicode errors or what can't translate well
         description = entry.description.split("<br />", 3) #split the description into three parts
         entry.title.decode("utf-8", "strict").encode("utf-8", "ignore") #in case there's a title in a foreign language
-
         
-        #check if the event is within the events dictionary already
+        #check if the event is within the events list already
         without = True
         for event in events:
             #does it have the title (entry.title) and location (description[0]) as the same thing?
             if (event.name == entry.title) and (event.location == description[0]):
                 without = False
                 
-        if without: #if event isn't already within the dictionary, put it in the dictionary
+        if without: #if event isn't already within the events list, add it to the events list
             
+            # MAKE THIS MORE EFFICIENT. DONT MAKE NEW STRING EVERY TIME.
             #remove quotation marks in title because it creates conflict
             if ("\'" in entry.title) or ("\"" in entry.title):
                 title = ""
@@ -106,6 +106,7 @@ def parse_events(FMDictionary):
                 name = title
             else:
                 name = entry.title
+                
             '''
             Sometimes there's an exception where an event doesn't have a location, thus no FMCode, and has the date and time of the event in the
             description. 
@@ -117,61 +118,70 @@ def parse_events(FMDictionary):
             building_name = ""
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
-            print keywords
-                    
+            
+            print name
+            # loops through all building names to determine which one the event is located at        
             for building in FMDictionary.keys():
                 if keywords[0] in building:
-                    print keywords[0]
-                    print building
-                    possibleBuildings.append(building)
-            
-            print len(possibleBuildings)
-            if len(possibleBuildings) > 1:
-                for possibility in possibleBuildings:
-                    if keywords[1] in possibility:
-                        building_name = possibility
-                        
+                    possibleBuildings.append(building)       
+                    #print building     
+                    print possibleBuildings
             ''' EXCEPTIONS TO WORK ON
                 
                 NO LOCATION
                 
+                IF IT CAN'T FIND IT THEN JUST MOVE ON (KeyError)
+                
                 LOCATIONS THAT WORK AREN'T IN THE BUILDINGS TABLE (EX. THE QUAD)
                 //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
-            ''' 
-                        
-            #some of the buildings are within another building so just assign them the same cartodb ID
-            elif keywords[0] == "Sweeney" or (keywords[0] == "Earle"):
-                building_name = "Sage Hall"
-            elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
-                building_name = "Wright Hall"
-            elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
-                building_name = "Mendenhall Center for Performing Arts"
-            elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
-                building_name = "Fine Arts Center"
-            elif (keywords[0] == "Quad"):
-                building_name = "Morrow House"
-            #only one code so get it
-            else:
-                building_name = possibleBuildings[0]
                 
-            fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
-                        
-            '''
-            Possibly grab date and time from <pubdate> field rather than description[1]
-            '''
-            #format date
-            date = description[1].split(",") #split string whenever it encounters a comma
-            date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
-            date = date_time[0]
-            
-            #format time
-            time = date_time[1].split()
-            times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
-            time = times[0] + " - " + times[1] #concatenate strings with the time    
-
-            #create an Event object
-            e = Event(name, location, fmcode, time, date)
-            events.append(e)
+                REMIND TO GET UPDATED LIST EVERY YEAR
+            ''' 
+                  
+            try:
+                if len(possibleBuildings) > 1:
+                    for possibility in possibleBuildings:
+                        if keywords[1] in possibility:
+                            building_name = possibility    
+                #some of the buildings are within another building so just assign them the same cartodb ID
+                elif len(possibleBuildings) == 1:
+                    # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
+                    butts = 5
+                elif (keywords[0] == "Sweeney") or (keywords[0] == "Earle"):
+                    building_name = "Sage Hall"
+                elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
+                    building_name = "Wright Hall"
+                elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
+                    building_name = "Mendenhall Center for Performing Arts"
+                elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
+                    building_name = "Fine Arts Center"
+                elif (keywords[0] == "Quad"):
+                    building_name = "Morrow House"
+                #only one code so get it
+                else:
+                    print possibleBuildings
+                    building_name = possibleBuildings[0]
+                fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
+                                
+                '''
+                Possibly grab date and time from <pubdate> field rather than description[1]
+                '''
+                #format date
+                date = description[1].split(",") #split string whenever it encounters a comma
+                date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
+                date = date_time[0]
+                    
+                #format time
+                time = date_time[1].split()
+                times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
+                time = times[0] + " - " + times[1] #concatenate strings with the time    
+    
+                #create an Event object
+                e = Event(name, location, fmcode, time, date)
+                events.append(e)
+                #print e.name
+            except KeyError:                        
+                butts = 5
     return events    
             
 '''
@@ -187,6 +197,7 @@ def main():
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
     FMDictionary = grabFMDictionary(cl)
+    # sort the dictionary in alphabetical order
     parse_events(FMDictionary)
 
 #calls the main function upon importing module
