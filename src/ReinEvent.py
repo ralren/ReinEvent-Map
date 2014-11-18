@@ -185,6 +185,8 @@ def parse_events(FM_Dict):
                 '''
                 date_time = entry.pubDate.split() #split pubDate's string into four parts
                 date = date_time[0] + date_time[1] + date_time[2] #join the first three parts
+                http://www.quora.com/How-can-I-convert-a-GMT-time-zone-into-local-time-in-Python
+                http://stackoverflow.com/questions/6288892/convert-datetime-format
                 '''
                 #format time
                 time = date_time[1].split()
