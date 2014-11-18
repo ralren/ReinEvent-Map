@@ -111,12 +111,14 @@ def parse_events(FM_Dict):
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
             
-            print name
+            print "this is the name of the event: " + name
             # loops through all building names to determine which one the event is located at        
             for building in FM_Dict.keys():
                 if keywords[0] in building:
                     possibleBuildings.append(building)       
                     #print building     
+                    print "this is the first word of the event location: " + keywords[0]
+                    print "the first word of the location is in building name. will print all possible buildings it could be: "
                     print possibleBuildings
                     
             ''' EXCEPTIONS TO WORK ON
@@ -129,6 +131,16 @@ def parse_events(FM_Dict):
                 //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
                 
                 REMIND TO GET UPDATED LIST EVERY YEAR
+                
+                NEEDS TO ACCOMODATE FOR SAME EVENT ON DIFFERENT DATES
+                
+                WILL EVENTUALLY ACCOUNT FOR EXCEPTIONS INSTEAD OF HAVING SPECIFIC ELIFS
+                
+                THE RSS FEED ALLOWS FOR ABOUT 35 EVENTS
+                
+                DOES NOT FIND TV STUDIO
+                CHAPIN HOUSE LAWN IS NOT ACCOUNTED FOR. NEED TO FIX HOW MANY KEYWORDS THE CODE CHECKS! MORE THAN 2!
+                NEILSON BROWSING ROOM DEFAULTS TO NEILSON LIBRARY
             ''' 
                   
             try:
@@ -140,6 +152,11 @@ def parse_events(FM_Dict):
                 elif len(possibleBuildings) == 0:
                     # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
                     butts = 5
+                    print "we checked the first two keywords and they match with a building. we have to fix this but it works"
+                elif len(possibleBuildings) == 1:
+                    print possibleBuildings
+                    building_name = possibleBuildings[0]
+                    print "there is only one possible building name: " + building_name
                 elif (keywords[0] == "Sweeney") or (keywords[0] == "Earle"):
                     building_name = "Sage Hall"
                 elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
@@ -149,11 +166,12 @@ def parse_events(FM_Dict):
                 elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
                     building_name = "Fine Arts Center"
                 elif (keywords[0] == "Quad"):
-                    building_name = "Morrow House"
+                    building_name = "Wilson House"
                 #only one code so get it
                 else:
-                    print possibleBuildings
-                    building_name = possibleBuildings[0]
+                    # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
+                    print "there are no possible events"
+
                 fmcode = FM_Dict[building_name] #look up fmcode using the building name and FMCodedictionary
                                 
                 '''
@@ -176,9 +194,14 @@ def parse_events(FM_Dict):
                 #create an Event object
                 e = Event(name, location, fmcode, time, date)
                 events.append(e)
+                print e.name + " has been added to the list of events"
+                print "its location is at " + building_name
+                print
                 #print e.name
-            except KeyError:                        
-                butts = 5
+            except KeyError:    
+                # can't match the event, just keep going                   
+                print "could not resolve event: " + name
+                print
     return events    
             
 '''
