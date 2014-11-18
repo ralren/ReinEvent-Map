@@ -119,14 +119,14 @@ def parse_events(FMDictionary):
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
             
-            print "this is the name of the event: " + name
+            print "EVENT NAME: " + name
             # loops through all building names to determine which one the event is located at        
             for building in FMDictionary.keys():
                 if keywords[0] in building:
                     possibleBuildings.append(building)       
                     #print building     
-                    print "this is the first word of the event location: " + keywords[0]
-                    print "the first word of the location is in building name. will print all possible buildings it could be: "
+                    print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
+                    print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                     print possibleBuildings
             ''' EXCEPTIONS TO WORK ON
                 
@@ -138,6 +138,8 @@ def parse_events(FMDictionary):
                 //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
                 
                 REMIND TO GET UPDATED LIST EVERY YEAR
+                
+                WHY IS IT PRINTING POSSIBLE BUILDINGS TWICE? DOESN'T REALLY MATTER
                 
                 NEEDS TO ACCOMODATE FOR SAME EVENT ON DIFFERENT DATES
                 
@@ -156,11 +158,11 @@ def parse_events(FMDictionary):
                         if keywords[1] in possibility:
                             building_name = possibility    
                 #some of the buildings are within another building so just assign them the same cartodb ID
-                    print "we checked the first two keywords and they match with a building. we have to fix this but it works"
+                    print "CHECKED TWO FIRST WORDS AND GOT A MATCH. FOR NOW WE WILL USE THE MATCH BUT WILL HAVE TO ACCOUNT FOR MORE LATER"
                 elif len(possibleBuildings) == 1:
                     print possibleBuildings
                     building_name = possibleBuildings[0]
-                    print "there is only one possible building name: " + building_name
+                    print "ONLY ONE POSSIBLE BUILDING: " + building_name
                 elif (keywords[0] == "Sweeney") or (keywords[0] == "Earle"):
                     building_name = "Sage Hall"
                 elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
@@ -174,7 +176,7 @@ def parse_events(FMDictionary):
                 #only one code so get it
                 else:
                     # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
-                    print "there are no possible events"
+                    print "NO POSSIBLE EVENT LOCATIONS"
 
                 fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
                                 
@@ -195,7 +197,7 @@ def parse_events(FMDictionary):
                 e = Event(name, location, fmcode, time, date)
                 events.append(e)
                 print e.name + " has been added to the list of events"
-                print "its location is at " + building_name
+                print e.name + "'s" + " location: " + building_name
                 print
                 #print e.name
             except KeyError:    
