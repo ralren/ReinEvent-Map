@@ -39,51 +39,45 @@ def insert_events():
     print "Done inserting events."   
 
 
-
 '''
-@summary Parse through the buildings table to get the FMCode of the event
-@params keywords, the location of the event
-        client, the required URL to manipulate the sql
-@return FMCode, the FMCode of a particular event
+@summary Grab buildings and their associated codes to place in a dictionary to be looked up later.
+@params client, the required URL to manipulate the sql
+@return building_FM, the dictionary which will allow us to look up a building name and its code.
 '''
-def grabFMDictionary(client):
-    '''
-    #initalize variables
-    keyword = keywords[0]
-    '''
-    buildFM = {}
+def grab_FMDict(client):
+    building_FM = {} #create an empty dict to later put building-FMCode pairs in
 
-    #go through the buildings table
-
+    #gain access to the buildings table from CartoDB account
     try:
         fields = client.sql('select * from buildings')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
-    num = len(fields['rows'])
+    num = len(fields['rows']) #figures number of rows in buildings table
     
     #go through each row within the buildings table
-    for n in range(0,num):
-        building_name = fields['rows'][n]['bldg_name']
+    for n in range(0,num): #n represents a row associated with a building
+        building_name = fields['rows'][n]['bldg_name'] 
         FMCode = fields['rows'][n]['fmcode']
-        buildFM[building_name] = FMCode
+        building_FM[building_name] = FMCode #add as key-value pair to dict
     
-    return buildFM
+    return building_FM
 
 '''
-@summary: Create a dictionary which will hold the events and their values
-@params: 
+@summary: Create a list which will hold the events.
+@params: FM_Dict, dictionary to lookup buildings and 
+@return: events, list of events
 '''
-def parse_events(FMDictionary):
+def parse_events(FM_Dict):
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
-    events = [] #holds the events
+    events = [] #list that holds the events
     
-    #parse through each event in the RSS feed
+    #parse through each event in the RSS feed which is listed as an entry
     for entry in calendar.entries:
         
         #fix any unicode errors or what can't translate well
-        description = entry.description.split("<br />", 3) #split the description into three parts
+        description = entry.description.split("<br />", 1) #split the description into a part
         entry.title.decode("utf-8", "strict").encode("utf-8", "ignore") #in case there's a title in a foreign language
         
         #check if the event is within the events list already
@@ -95,16 +89,14 @@ def parse_events(FMDictionary):
                 
         if without: #if event isn't already within the events list, add it to the events list
             
-            # MAKE THIS MORE EFFICIENT. DONT MAKE NEW STRING EVERY TIME.
-            #remove quotation marks in title because it creates conflict
+            #remove quotation marks in title because it creates conflict when putting the name in CartoDB table
             if ("\'" in entry.title) or ("\"" in entry.title):
-                title = ""
-                for letter in entry.title:
-                    if (letter != "'") and (letter != "\""):
+                title = "" 
+                for letter in entry.title: #go through letter by letter in the title to check if it's a quotation mark
+                    if (letter != "'") and (letter != "\""): #if not a quotation mark, add it to the title
                         title += letter
-            
                 name = title
-            else:
+            else: #if quotation marks doesn't exist in the title, go ahead and grab it
                 name = entry.title
                 
             '''
@@ -121,11 +113,12 @@ def parse_events(FMDictionary):
             
             print name
             # loops through all building names to determine which one the event is located at        
-            for building in FMDictionary.keys():
+            for building in FM_Dict.keys():
                 if keywords[0] in building:
                     possibleBuildings.append(building)       
                     #print building     
                     print possibleBuildings
+                    
             ''' EXCEPTIONS TO WORK ON
                 
                 NO LOCATION
@@ -144,7 +137,7 @@ def parse_events(FMDictionary):
                         if keywords[1] in possibility:
                             building_name = possibility    
                 #some of the buildings are within another building so just assign them the same cartodb ID
-                elif len(possibleBuildings) == 1:
+                elif len(possibleBuildings) == 0:
                     # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
                     butts = 5
                 elif (keywords[0] == "Sweeney") or (keywords[0] == "Earle"):
@@ -161,7 +154,7 @@ def parse_events(FMDictionary):
                 else:
                     print possibleBuildings
                     building_name = possibleBuildings[0]
-                fmcode = FMDictionary[building_name] #look up fmcode using the building name and FMCodedictionary
+                fmcode = FM_Dict[building_name] #look up fmcode using the building name and FMCodedictionary
                                 
                 '''
                 Possibly grab date and time from <pubdate> field rather than description[1]
@@ -171,6 +164,10 @@ def parse_events(FMDictionary):
                 date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
                 date = date_time[0]
                     
+                '''
+                date_time = entry.pubDate.split() #split pubDate's string into four parts
+                date = date_time[0] + date_time[1] + date_time[2] #join the first three parts
+                '''
                 #format time
                 time = date_time[1].split()
                 times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
@@ -196,9 +193,8 @@ def main():
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    FMDictionary = grabFMDictionary(cl)
-    # sort the dictionary in alphabetical order
-    parse_events(FMDictionary)
+    FM_Dict = grab_FMDict(cl)
+    parse_events(FM_Dict)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
