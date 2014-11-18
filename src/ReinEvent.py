@@ -194,7 +194,8 @@ def parse_events(FMDictionary):
                 #create an Event object
                 e = Event(name, location, fmcode, time, date)
                 events.append(e)
-                print e.name + " has been added to the list of events with its location at " + building_name
+                print e.name + " has been added to the list of events"
+                print "its location is at " + building_name
                 print
                 #print e.name
             except KeyError:    
