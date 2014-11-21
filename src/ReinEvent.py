@@ -77,6 +77,7 @@ def parse_events(FM_Dict):
     
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
+    #calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events")
     events = [] #list that holds the events
     
     #parse through each event in the RSS feed which is listed as an entry
@@ -91,7 +92,8 @@ def parse_events(FM_Dict):
         for event in events:
             #does it have the title (entry.title) and location (description[0]) as the same thing?
             if (event.name == entry.title) and (event.location == description[0]):
-                without = False
+                #without = False
+                print("IT'S A DOUBLE")
                 
         if without: #if event isn't already within the events list, add it to the events list
             
