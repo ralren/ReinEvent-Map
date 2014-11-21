@@ -77,6 +77,7 @@ def parse_events(FM_Dict):
     
     #set up to parse through content in RSS feed
     calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
+    #calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events")
     events = [] #list that holds the events
     
     #parse through each event in the RSS feed which is listed as an entry
@@ -86,6 +87,7 @@ def parse_events(FM_Dict):
         description = entry.description.split("<br />", 2) #split the description into two parts
         entry.title.decode("utf-8", "strict").encode("utf-8", "ignore") #in case there's a title in a foreign language
         
+
         #remove quotation marks in title because it creates conflict when putting the name in CartoDB table
         if ("\'" in entry.title) or ("\"" in entry.title):
             title = "" 
@@ -95,7 +97,7 @@ def parse_events(FM_Dict):
             name = title
         else: #if quotation marks doesn't exist in the title, go ahead and grab it
             name = entry.title
-            
+
         '''
         Sometimes there's an exception where an event doesn't have a location, thus no FMCode, and has the date and time of the event in the
         description. 
