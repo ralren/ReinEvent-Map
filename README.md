@@ -22,3 +22,8 @@ This is a Revamp of the previous map events project for the Smith College Spatia
 	- NOTE: the code will parse over events it can’t identify, but it would be best to account for as many as possible so this is important for identifying new locations, buildings with changed names, etc.
 	- NOTE: you will find a lot of event locations you never could have imagined. isn’t that cool?
 - Go back to the code. Make sure you know how it works in case it crashes. Feel free to make more efficient.
+
+### TO DO
+- add building column called "row ref" to tables. This column will be used to attribute certain locations to a building. For example, if Bass Hall was in row 5, Young Science Library would have a 5 in its row ref column. Bass Hall would not have anything in its row ref column, because it is a major building/event location (in cartodb)
+- change dictionary so it pulls category row ref instead of fm dictionary (in python)
+- adjust function to put events as rows in building points table
