@@ -16,14 +16,14 @@ class Event:
     @params: self,
              name, event's name
              location, where the event will take place
-             FMCode, building code associated with the location
+             row_ref, building code associated with the location
              time, hour(s) the event will take place
              date, when the event will happen
     '''
-    def __init__(self, name, location, FMCode, time, date):
+    def __init__(self, name, location, row_ref, time, date):
         self.name = name
         self.location = location
-        self.FMCode = FMCode
+        self.row_ref = row_ref
         self.time = time
         self.date = date
 ''' CLASS OVER '''   
@@ -40,16 +40,19 @@ def insert_events():
 
 
 '''
-@summary Grab buildings and their associated codes to place in a dictionary to be looked up later.
+@summary Grab buildings and their associated row references to place in a dictionary to be looked up later.
+         Row references are numbers for smaller locations  (ex. Seelye 102, Weinstein Auditorium) to
+         references the larger locations they are within (ex. Seelye Hall, Wright Hall). This is so we
+         end up creating one point per building/major event location, rather than a large jumble of random points
 @params client, the required URL to manipulate the sql
 @return building_FM, the dictionary which will allow us to look up a building name and its code.
 '''
-def grab_FMDict(client):
-    building_FM = {} #create an empty dict to later put building-FMCode pairs in
+def grab_RowDict(client):
+    building_RowRef = {} #create an empty dict to later put building-row_ref pairs in
 
     #gain access to the buildings table from CartoDB account
     try:
-        fields = client.sql('select * from buildings')
+        fields = client.sql('select * from buildingpoints')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
@@ -57,11 +60,27 @@ def grab_FMDict(client):
     
     #go through each row within the buildings table
     for n in range(0,num): #n represents a row associated with a building
+        row_ref = fields['rows'][n]['row_ref']
+        
         building_name = fields['rows'][n]['bldg_name'] 
-        FMCode = fields['rows'][n]['fmcode']
-        building_FM[building_name] = FMCode #add as key-value pair to dict
-    
-    return building_FM
+        event_loca = fields['rows'][n]['event_loca']
+        
+        if ((building_name == None) and (event_loca != None)) or ((building_name != None) and (event_loca != None)):
+            location = event_loca
+        elif (building_name != None) and (event_loca == None):
+            location = building_name 
+        else:        
+            location = "LOCATION NOT FOUND"
+            
+        building_RowRef[location] = row_ref
+        ''' TEMP TEST START '''
+        print location
+        print fields['rows'][n]['cartodb_id'] 
+        print row_ref
+        print
+        ''' TEMP TEST END '''
+        
+    return building_RowRef
 
 '''
 @summary: Create a list which will hold the events.
@@ -103,18 +122,18 @@ def parse_events(FM_Dict):
                 for letter in entry.title: #go through letter by letter in the title to check if it's a quotation mark
                     if (letter != "'") and (letter != "\""): #if not a quotation mark, add it to the title
                         title += letter
-                name = title
+                name = title     
             else: #if quotation marks doesn't exist in the title, go ahead and grab it
                 name = entry.title
                 
             '''
-            Sometimes there's an exception where an event doesn't have a location, thus no FMCode, and has the date and time of the event in the
+            Sometimes there's an exception where an event doesn't have a location, thus no building name, but still has the date and time of the event in the
             description. 
             '''
             #format location
             location = description[0] 
             
-            #format fmcode
+            #format row_ref
             building_name = ""
             possibleBuildings = []
             keywords = location.split() # split the location name so we can isolate the building name
@@ -132,12 +151,12 @@ def parse_events(FM_Dict):
                     
             ''' EXCEPTIONS TO WORK ON
                 
-                NO LOCATION
+                NO LOCATION - GOT IT
                 
-                IF IT CAN'T FIND IT THEN JUST MOVE ON (KeyError)
+                IF IT CAN'T FIND IT THEN JUST MOVE ON (KeyError) - GOT IT
                 
                 LOCATIONS THAT WORK AREN'T IN THE BUILDINGS TABLE (EX. THE QUAD)
-                //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS
+                //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS - IT SKIPS
                 
                 REMIND TO GET UPDATED LIST EVERY YEAR
                 
@@ -178,7 +197,7 @@ def parse_events(FM_Dict):
                     # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
                     print "NO POSSIBLE EVENT LOCATIONS"
 
-                fmcode = FM_Dict[building_name] #look up fmcode using the building name and FMCodedictionary
+                row_ref = FM_Dict[building_name] #look up row_ref using the building name and row_refdictionary
                                 
                 '''
                 Possibly grab date and time from <pubdate> field rather than description[1]
@@ -200,7 +219,7 @@ def parse_events(FM_Dict):
                 time = times[0] + " - " + times[1] #concatenate strings with the time    
     
                 #create an Event object
-                e = Event(name, location, fmcode, time, date)
+                e = Event(name, location, row_ref, time, date)
                 events.append(e)
                 events_added+=1
                 print e.name + " has been added to the list of events"
@@ -238,7 +257,7 @@ def main():
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    FM_Dict = grab_FMDict(cl)
+    FM_Dict = grab_RowDict(cl)
     parse_events(FM_Dict)
 
 #calls the main function upon importing module
