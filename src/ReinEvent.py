@@ -3,11 +3,38 @@ Created on Oct 28, 2014
 
 @author: RenSol
 @description: This class is used to store event data from the Smith College events calendar to be mapped later on.
+
+CODE UPKEEP: Hi! This program was written by the RenSol programming team for the SAL lab at Smith.
+             If you are reading this you are probably:
+                 1) a person who is just browsing the code
+                 2) casually updating the code
+                 3) WE GOT ERRORS UP THE WAZOO!
+                 or
+                 4) THE PROGRAM IS BROKEN! EVERYTHING IS TERRIBLE! WHAT SHOULD I DO?!?!?!
+             If you are 1, feel free to skip over this part. If you are 3,4, or even 2, read on.
+             
+             We've left a lot of information about how to maintain this code, and we've created several tests
+             in case something happens.
+                          
+             For a description of what exactly the code is for, what it is doing, and why it is doing it: https://github.com/sessionista/ReinEvent-Map/blob/master/README.md
+             
+             Specific tips and instructions on the code's upkeep:
+             
+             The original code: https://github.com/sessionista/ReinEvent-Map/blob/master/src/ReinEvent.py
+
+             Below you will find commends blocks that say "something" TEST. These tests include descriptions and
+             debugging tips. Uncomment these blocks and read the print statements. These should give some insight
+             on whether this specific block is what is causing the problems. We created tests for the most
+             variable elements of our code that we have the least control over (ex. building names, RSS feed, etc.)
+             
 '''
+
 import feedparser
 import cartodb
 
-''' START THIS CLASS!
+
+
+'''
 @summary: Event is a class that each singular event would be stored in. Each event object will then have several parameters containing info about the event.
 '''
 class Event:
@@ -26,8 +53,7 @@ class Event:
         self.row_ref = row_ref
         self.time = time
         self.date = date
-''' CLASS OVER '''   
-
+   
 
 
 '''
@@ -73,12 +99,28 @@ def grab_RowDict(client):
             location = "LOCATION NOT FOUND"
             
         building_RowRef[location] = row_ref
-        ''' TEMP TEST START '''
+        
+        ''' RowRef TEST START
+        
+        DESCRIPTION: IF THE CODE BREAKS FOR SOME REASON THIS TEST IS TO MAKE SURE THE ROW REFERENCES
+                     ARE WORKING (FROM CARTODB)
+        POSSIBLE BREAK REASONS: The buildings need to be updated periodically because names change
+                                (ex. a center gets named after someone), locations change, and new buildings
+                                are added almost annually. This means that certain 
+        DEBUGGING: Uncomment this test to check the row references. You will need the cartodb table
+                   the code is referencing (see main method to get api key for table). RowRef is
+                   a column in the table used to attribute certain locations to a building.
+                   For example, if Bass Hall was in row 5, Young Science Library would have a 5 in its row ref
+                   column. Bass Hall would not have anything in its row ref column, because it is a major
+                   building/event location (in cartodb). Make sure the row references are correct. This will
+                   require some Googling and/or good knowledge of the campus locations
+                   
         print location
         print fields['rows'][n]['cartodb_id'] 
         print row_ref
         print
-        ''' TEMP TEST END '''
+        
+        RowRef TEST END '''
         
     return building_RowRef
 
@@ -128,65 +170,62 @@ def parse_events(FM_Dict):
         possibleBuildings = []
         keywords = location.split() # split the location name so we can isolate the building name
         
+        ''' Find event location TEST START (pt 1)
+        
+        DESCRIPTION: THIS IS A SPECIAL TEST!!! IT HAS 5 PARTS! IN ORDER TO USE THIS TEST, MAKE SURE YOU UNCOMMENT
+                     ALL 5 PARTS! AT THE END OF THE 5TH PART IT WILL SAY "Find event location TEST END"
+        POSSIBLE BREAK REASONS:
+        DEBUGGING: 
+        
+        print
         print "EVENT NAME: " + name
+        
+        '''
+        
         total_events += 1
         # loops through all building names to determine which one the event is located at        
         for building in FM_Dict.keys():
             if keywords[0] in building:
                 possibleBuildings.append(building)       
-                #print building     
+                #print building  
+                
+                ''' Find event location TEST START (pt 2)   
                 print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
                 print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                 print possibleBuildings
+                '''
                 
-        ''' EXCEPTIONS TO WORK ON
-            
-            NO LOCATION - GOT IT
-            
-            IF IT CAN'T FIND IT THEN JUST MOVE ON (KeyError) - GOT IT
-            
-            LOCATIONS THAT WORK AREN'T IN THE BUILDINGS TABLE (EX. THE QUAD)
-            //IF BUILDINGS TABLE WAS ACCORDING TO WHERE YOU COULD BOOK EVENTS - IT SKIPS
-            
-            REMIND TO GET UPDATED LIST EVERY YEAR
-            
-            WHY IS IT PRINTING POSSIBLE BUILDINGS TWICE? DOESN'T REALLY MATTER
-            
-            NEEDS TO ACCOMODATE FOR SAME EVENT ON DIFFERENT DATES
-            
-            WILL EVENTUALLY ACCOUNT FOR EXCEPTIONS INSTEAD OF HAVING SPECIFIC ELIFS
-            
-            THE RSS FEED ALLOWS FOR ABOUT 35 EVENTS
-            
-            DOES NOT FIND TV STUDIO
-            CHAPIN HOUSE LAWN IS NOT ACCOUNTED FOR. NEED TO FIX HOW MANY KEYWORDS THE CODE CHECKS! MORE THAN 2!
-            NEILSON BROWSING ROOM DEFAULTS TO NEILSON LIBRARY
-        ''' 
               
         try:
             if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
                         building_name = possibility    
+                        
+                        ''' Find event location TEST START (pt 3)
                         print "CHECKED TWO FIRST WORDS AND GOT A MATCH. FOR NOW WE WILL USE THE MATCH BUT WILL HAVE TO ACCOUNT FOR MORE LATER"
+                        '''
             elif len(possibleBuildings) == 1:
                 building_name = possibleBuildings[0]
+               
+                ''' Find event location TEST START (pt 4)
                 print "ONLY ONE POSSIBLE BUILDING: " + building_name
-            else:             #only one code so get it
-                # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
-                print "NO POSSIBLE EVENT LOCATIONS"
+                '''
+            else:       
+                ''' Find event location TEST START (pt 5)    
+                print "NO POSSIBLE EVENT LOCATIONS"  # this is usually if there is a date instead of an event location
+                Find event location TEST END'''
 
             row_ref = FM_Dict[building_name] #look up row_ref using the building name and row_refdictionary
                             
-            '''
-            Possibly grab date and time from <pubdate> field rather than description[1]
-            '''
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
             date = date_time[0]
                 
             '''
+            Possibly grab date and time from <pubdate> field rather than description[1]            
+            
             date_time = entry.pubDate.split() #split pubDate's string into four parts
             date = date_time[0] + date_time[1] + date_time[2] #join the first three parts
             http://www.quora.com/How-can-I-convert-a-GMT-time-zone-into-local-time-in-Python
@@ -201,18 +240,32 @@ def parse_events(FM_Dict):
             e = Event(name, location, row_ref, time, date)
             events.append(e)
             events_added+=1
+            
+            ''' Events added TEST START
+        
+            DESCRIPTION:
+            POSSIBLE BREAK REASONS:
+            DEBUGGING: 
             print e.name + " has been added to the list of events"
             print e.name + "'s" + " loca: " + building_name
             print e.name + "'s" + " time: " + e.time
             print e.name + "'s" + " date: " + e.date
             print
-            #print e.name
+            
+            Events added TEST END'''
+            
         except KeyError:    
             # can't match the event, just keep going                   
             print "could not resolve event: " + name
             print
             events_dropped+=1
             
+    ''' Parsed events TEST START
+        
+        DESCRIPTION:
+        POSSIBLE BREAK REASONS:
+        DEBUGGING: 
+        
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -221,7 +274,9 @@ def parse_events(FM_Dict):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-     
+    
+    Parsed events TEST END '''
+            
     return events    
             
 '''
