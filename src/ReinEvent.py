@@ -172,18 +172,7 @@ def parse_events(FM_Dict):
             elif len(possibleBuildings) == 1:
                 building_name = possibleBuildings[0]
                 print "ONLY ONE POSSIBLE BUILDING: " + building_name
-            elif (keywords[0] == "Sweeney") or (keywords[0] == "Earle"):
-                building_name = "Sage Hall"
-            elif (keywords[0] == "Lewis") or (keywords[0] == "Weinstein"):
-                building_name = "Wright Hall"
-            elif (keywords[0] == "Hallie") or (keywords[0] == "Theatre") or (keywords[0] == "Formerly"):
-                building_name = "Mendenhall Center for Performing Arts"
-            elif (keywords[0] == "BFAC") or (keywords[0] == "Hillyer") or (keywords[0] == "Graham"):
-                building_name = "Fine Arts Center"
-            elif (keywords[0] == "Quad"):
-                building_name = "Wilson House"
-            #only one code so get it
-            else:
+            else:             #only one code so get it
                 # IF THE LIST IS BLANK OR THERE IS A DATE INSTEAD OF AN EVENT
                 print "NO POSSIBLE EVENT LOCATIONS"
 
