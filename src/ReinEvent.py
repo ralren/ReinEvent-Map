@@ -119,8 +119,9 @@ def grab_RowDict(client):
         print fields['rows'][n]['cartodb_id'] 
         print row_ref
         print
+        '''
         
-        RowRef TEST END '''
+        '''RowRef TEST END '''
         
     return building_RowRef
 
@@ -176,12 +177,13 @@ def parse_events(FM_Dict):
                      ALL 5 PARTS! AT THE END OF THE 5TH PART IT WILL SAY "Find event location TEST END"
         POSSIBLE BREAK REASONS:
         DEBUGGING: 
-        
-        print
-        print "EVENT NAME: " + name
-        
         '''
         
+        '''
+        print
+        print "EVENT NAME: " + name
+        '''
+                
         total_events += 1
         # loops through all building names to determine which one the event is located at        
         for building in FM_Dict.keys():
@@ -189,7 +191,8 @@ def parse_events(FM_Dict):
                 possibleBuildings.append(building)       
                 #print building  
                 
-                ''' Find event location TEST START (pt 2)   
+                ''' Find event location TEST START (pt 2)'''
+                '''  
                 print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
                 print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                 print possibleBuildings
@@ -202,19 +205,23 @@ def parse_events(FM_Dict):
                     if keywords[1] in possibility:
                         building_name = possibility    
                         
-                        ''' Find event location TEST START (pt 3)
+                        ''' Find event location TEST START (pt 3)'''
+                        '''
                         print "CHECKED TWO FIRST WORDS AND GOT A MATCH. FOR NOW WE WILL USE THE MATCH BUT WILL HAVE TO ACCOUNT FOR MORE LATER"
                         '''
             elif len(possibleBuildings) == 1:
                 building_name = possibleBuildings[0]
                
-                ''' Find event location TEST START (pt 4)
+                ''' Find event location TEST START (pt 4)'''
+                '''
                 print "ONLY ONE POSSIBLE BUILDING: " + building_name
                 '''
             else:       
-                ''' Find event location TEST START (pt 5)    
+                ''' Find event location TEST START (pt 5)'''
+                '''
                 print "NO POSSIBLE EVENT LOCATIONS"  # this is usually if there is a date instead of an event location
-                Find event location TEST END'''
+                '''
+                '''Find event location TEST END'''
 
             row_ref = FM_Dict[building_name] #look up row_ref using the building name and row_refdictionary
                             
@@ -241,18 +248,22 @@ def parse_events(FM_Dict):
             events.append(e)
             events_added+=1
             
-            ''' Events added TEST START
-        
+            '''
+            Events added TEST START
             DESCRIPTION:
             POSSIBLE BREAK REASONS:
             DEBUGGING: 
+            '''
+            
+            '''
             print e.name + " has been added to the list of events"
             print e.name + "'s" + " loca: " + building_name
             print e.name + "'s" + " time: " + e.time
             print e.name + "'s" + " date: " + e.date
             print
+            '''
             
-            Events added TEST END'''
+            '''Events added TEST END'''
             
         except KeyError:    
             # can't match the event, just keep going                   
@@ -260,12 +271,14 @@ def parse_events(FM_Dict):
             print
             events_dropped+=1
             
-    ''' Parsed events TEST START
-        
-        DESCRIPTION:
-        POSSIBLE BREAK REASONS:
-        DEBUGGING: 
-        
+    ''' 
+    Parsed events TEST START
+    DESCRIPTION:
+    POSSIBLE BREAK REASONS:
+    DEBUGGING: 
+    '''
+       
+    '''  
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -274,8 +287,7 @@ def parse_events(FM_Dict):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-    
-    Parsed events TEST END '''
+    '''
             
     return events    
             
