@@ -117,7 +117,10 @@ def grab_RowDict(client):
                    column. Bass Hall would not have anything in its row ref column, because it is a major
                    building/event location (in cartodb). Make sure the row references are correct. This will
                    require some Googling and/or good knowledge of the campus locations
-                   
+        
+        '''
+        
+        '''     
         print location
         print fields['rows'][n]['cartodb_id'] 
         print row_ref
