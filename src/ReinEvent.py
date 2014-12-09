@@ -60,8 +60,11 @@ class Event:
 @summary: Insert the data into the CartoDB account
 @params: 
 '''
-def insert_events():
+def insert_events(events, client):
     print "Inserting events..."
+    for e in events:
+        command = "INSERT INTO buildingpoints (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+        client.sql(command)
     print "Done inserting events."   
 
 
@@ -303,8 +306,9 @@ def main():
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
+    cl.sql("DELETE FROM buildingpoints WHERE cartodb_id > 223") #223 is the last row for the buildingpoints up until we add events to the table
     FM_Dict = grab_RowDict(cl)
-    parse_events(FM_Dict)
+    insert_events(parse_events(FM_Dict), cl)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
