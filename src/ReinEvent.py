@@ -303,9 +303,9 @@ def parse_events(FM_Dict):
 def main():
 
     #user information
-    user = "smithgis@smith.edu"
-    api_key = "59651a7eb7bfa39b60a7160859432749e92b8fda"
-    cartodb_domain = "smithgis"
+    user = "" //empty string for privacy
+    api_key = "" //empty string for privacy
+    cartodb_domain = "" //empty string for privacy
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
