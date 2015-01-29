@@ -79,6 +79,7 @@ def insert_events(events, client):
 def grab_RowDict(client):
     building_RowRef = {} #create an empty dict to later put building-row_ref pairs in
 
+
     #gain access to the buildings table from CartoDB account
     try:
         fields = client.sql('select * from buildingpoints_copy')
@@ -95,13 +96,17 @@ def grab_RowDict(client):
         event_loca = fields['rows'][n]['event_loca']
         
         if ((building_name == None) and (event_loca != None)) or ((building_name != None) and (event_loca != None)):
-            location = event_loca
+            cap_location = event_loca
         elif (building_name != None) and (event_loca == None):
-            location = building_name 
+            cap_location = building_name 
         else:        
-            location = "LOCATION NOT FOUND"
+            cap_location = "LOCATION NOT FOUND"
             
-        building_RowRef[location] = row_ref
+        cap_location = cap_location.upper() # making uppercase so we eliminate any errors from case sensitivity
+            
+        building_RowRef[cap_location] = row_ref
+        
+        
         
         ''' RowRef TEST START
         
@@ -133,10 +138,10 @@ def grab_RowDict(client):
 
 '''
 @summary: Create a list which will hold the events.
-@params: FM_Dict, dictionary to lookup buildings 
+@params: Row_Dict, dictionary to lookup buildings 
 @return: events, list of events
 '''
-def parse_events(FM_Dict):
+def parse_events(Row_Dict):
     
     # variables to count events
     events_dropped = 0
@@ -175,8 +180,9 @@ def parse_events(FM_Dict):
         #format row_ref
         building_name = ""
         possibleBuildings = []
-        keywords = location.split() # split the location name so we can isolate the building name
         
+        keywords = location.upper().split() # split the location name so we can isolate the building name
+                                            # making uppercase so we eliminate any errors from case sensitivity
         ''' Find event location TEST START (pt 1)
         
         DESCRIPTION: THIS IS A SPECIAL TEST!!! IT HAS 5 PARTS! IN ORDER TO USE THIS TEST, MAKE SURE YOU UNCOMMENT
@@ -192,10 +198,10 @@ def parse_events(FM_Dict):
                 
         total_events += 1
         # loops through all building names to determine which one the event is located at        
-        for building in FM_Dict.keys():
+        for building in Row_Dict.keys():
+            
             if keywords[0] in building:
                 possibleBuildings.append(building)       
-                #print building  
                 
                 ''' Find event location TEST START (pt 2)'''
                
@@ -207,6 +213,7 @@ def parse_events(FM_Dict):
                 
               
         try:
+            print possibleBuildings
             if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
@@ -230,7 +237,7 @@ def parse_events(FM_Dict):
                 '''
                 '''Find event location TEST END'''
 
-            row_ref = FM_Dict[building_name] #look up row_ref using the building name and row_refdictionary
+            row_ref = Row_Dict[building_name] #look up row_ref using the building name and row_refdictionary
                             
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
@@ -285,7 +292,7 @@ def parse_events(FM_Dict):
     DEBUGGING: 
     '''
        
-    '''
+    
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -294,7 +301,7 @@ def parse_events(FM_Dict):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-    '''
+    
             
     return events    
             
@@ -304,15 +311,15 @@ def parse_events(FM_Dict):
 def main():
 
     #user information
-    user = "" #empty string for privacy
-    api_key = "" #empty string for privacy
-    cartodb_domain = "" #empty string for privacy
+    user = "smithgis@smith.edu" # empty string for privacy
+    api_key = "388ff8dd9f9cbbfd5aa0a5a426951567d1052575" # empty string for privacy
+    cartodb_domain = "smithgis" # empty string for privacy
 
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
     cl.sql("DELETE FROM buildingpoints_copy WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
-    FM_Dict = grab_RowDict(cl)
-    insert_events(parse_events(FM_Dict), cl)
+    Row_Dict = grab_RowDict(cl)
+    insert_events(parse_events(Row_Dict), cl)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
