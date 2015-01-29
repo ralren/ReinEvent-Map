@@ -11,7 +11,7 @@ CODE UPKEEP: Hi! This program was written by the RenSol programming team for the
                  3) WE GOT ERRORS UP THE WAZOO!
                  or
                  4) THE PROGRAM IS BROKEN! EVERYTHING IS TERRIBLE! WHAT SHOULD I DO?!?!?!
-             If you are 1, feel free to skip over this part. If you are 3,4, or even 2, read on.
+             If you are 1, feel free to skip over this part. If you are 3, 4, or even 2, read on.
              
              We've left a lot of information about how to maintain this code, and we've created several tests
              in case something happens.
@@ -304,10 +304,10 @@ def parse_events(FM_Dict):
 def main():
 
     #user information
-    user = "" # empty string for privacy
-    api_key = "" # empty string for privacy
-    cartodb_domain = "" # empty string for privacy
-        
+    user = "" #empty string for privacy
+    api_key = "" #empty string for privacy
+    cartodb_domain = "" #empty string for privacy
+
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
     cl.sql("DELETE FROM buildingpoints_copy WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
