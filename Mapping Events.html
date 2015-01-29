@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ReinEvent map | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+ 
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.ie.css" />
+    <![endif]-->
+  </head>
+  <body>
+    <div id="map"></div>
+ 
+    <!-- include google maps library *before* load cartodb.js -->
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.uncompressed.js"></script>
+ 
+    <script>
+      var INFOWINDOW_TEMPLATE = [
+      '<div class="cartodb-popup">',
+      '  <a href="#close" class="cartodb-popup-close-button close">x</a>',
+      '   <div class="cartodb-popup-content-wrapper">',
+      '     <div class="cartodb-popup-content">',
+      '        <h4>Location: </h4>',
+      '        <div id="location">',
+      '         <script>',
+      '           figure_location({{content.data.row_ref}});',
+      '         </scr' + 'ipt>',
+      '         </div>',
+      '        <h4>Events: </h4>',
+      '     </div>',
+      '   </div>',
+      '   <div class="cartodb-popup-tip-container"></div>',
+      '</div>'].join('');
+
+      function figure_location(ref) {
+        var sql = new cartodb.SQL({ user: 'user_name' });
+        
+        sql.execute("SELECT * FROM buildingpoints_copy WHERE cartodb_id = {{id}}", { id: ref })
+          .done(function(data) {
+            var div = document.getElementById('location');
+            div.innerHTML = div.innerHTML + data.rows[0].bldg_name;
+            console.log(data.rows);
+          })
+      }
+
+      //create visualization at runtime
+      function main() {
+          //var map;
+          //var my_city = new google.maps.LatLng(42.3181, -72.6381);
+          //var mapOptions = {
+            //zoom: 16,
+            //center: my_city,
+            
+          //};
+          //map = new google.maps.Map(document.getElementById('map'),  mapOptions);
+
+        var map = L.map('map', {
+          scrollWheelZoom: false,
+          center: [42.3181, -72.6381],
+          zoom: 16
+        });
+
+        L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
+          attribution: 'Stamen'
+        }).addTo(map);
+        
+        //buildings layer
+        cartodb.createLayer(map, {
+          user_name: 'user_name',
+          type: 'cartodb',
+          sublayers: [{
+            sql: "SELECT * FROM campusbuildings2014_copy",
+            cartocss: '#campusbuildings2014_copy { polygon-fill: #0F3B82; polygon-opacity: 0.6; line-color: #FFF; line-width: 1; line-opacity: 1;}',
+            }]
+          })
+          .addTo(map) //ultimately not displayed
+          .on('done', function(layer) {
+          })//end of first on function  
+        
+        //building points layer
+        cartodb.createLayer(map, {
+          user_name: 'user_name',
+            type: 'cartodb',
+            sublayers: [{
+              sql: "SELECT * FROM buildingpoints_copy",
+              cartocss: '#buildingpoints_copy { marker-fill: orange; marker-width: 8;}',
+              interactivity: 'cartodb_id'
+            }]
+          })
+          .addTo(map)
+          .on('done', function(layer) {
+            // get sublayer 0 and set the infowindow template
+            var sublayer = layer.getSubLayer(0);
+      
+            // when you create a visualization from scratch you need to 
+            // use cdb.vis.Vis.addInfowindow to set the params
+            // if you use viz.json the infowindow params are inside it
+            cdb.vis.Vis.addInfowindow(map, sublayer, ['cartodb_id','bldg_name'], {
+            // we provide a nice default template, if you want yours uncomment this
+              infowindowTemplate: INFOWINDOW_TEMPLATE
+            });
+            sublayer.setInteraction(true);
+          })//end of second on function
+      }//end main
+ 
+      window.onload = main;
+    </script>
+  </body>
+</html>
