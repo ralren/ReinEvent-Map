@@ -213,7 +213,6 @@ def parse_events(Row_Dict):
                 
               
         try:
-            print possibleBuildings
             if len(possibleBuildings) > 1:
                 for possibility in possibleBuildings:
                     if keywords[1] in possibility:
@@ -292,7 +291,7 @@ def parse_events(Row_Dict):
     DEBUGGING: 
     '''
        
-    
+    '''
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -301,7 +300,7 @@ def parse_events(Row_Dict):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-    
+    '''
             
     return events    
             
@@ -311,9 +310,9 @@ def parse_events(Row_Dict):
 def main():
 
     #user information
-    user = "smithgis@smith.edu" # empty string for privacy
-    api_key = "388ff8dd9f9cbbfd5aa0a5a426951567d1052575" # empty string for privacy
-    cartodb_domain = "smithgis" # empty string for privacy
+    user = "" # empty string for privacy
+    api_key = "" # empty string for privacy
+    cartodb_domain = "" # empty string for privacy
 
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
