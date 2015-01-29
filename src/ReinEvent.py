@@ -63,7 +63,7 @@ class Event:
 def insert_events(events, client):
     print "Inserting events..."
     for e in events:
-        command = "INSERT INTO buildingpoints (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+        command = "INSERT INTO buildingpoints_copy (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
         client.sql(command)
     print "Done inserting events."   
 
@@ -81,7 +81,7 @@ def grab_RowDict(client):
 
     #gain access to the buildings table from CartoDB account
     try:
-        fields = client.sql('select * from buildingpoints')
+        fields = client.sql('select * from buildingpoints_copy')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
@@ -133,7 +133,7 @@ def grab_RowDict(client):
 
 '''
 @summary: Create a list which will hold the events.
-@params: FM_Dict, dictionary to lookup buildings and 
+@params: FM_Dict, dictionary to lookup buildings 
 @return: events, list of events
 '''
 def parse_events(FM_Dict):
@@ -198,7 +198,8 @@ def parse_events(FM_Dict):
                 #print building  
                 
                 ''' Find event location TEST START (pt 2)'''
-                '''  
+               
+                ''' 
                 print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
                 print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                 print possibleBuildings
@@ -284,7 +285,7 @@ def parse_events(FM_Dict):
     DEBUGGING: 
     '''
        
-    '''  
+    '''
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -303,13 +304,13 @@ def parse_events(FM_Dict):
 def main():
 
     #user information
-    user = "" //empty string for privacy
-    api_key = "" //empty string for privacy
-    cartodb_domain = "" //empty string for privacy
+    user = "" # empty string for privacy
+    api_key = "" # empty string for privacy
+    cartodb_domain = "" # empty string for privacy
         
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    cl.sql("DELETE FROM buildingpoints WHERE cartodb_id > 223") #223 is the last row for the buildingpoints up until we add events to the table
+    cl.sql("DELETE FROM buildingpoints_copy WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
     FM_Dict = grab_RowDict(cl)
     insert_events(parse_events(FM_Dict), cl)
 
