@@ -11,6 +11,53 @@
         padding: 0;
         margin: 0;
       }
+
+      .infowindow-custom{ 
+        position: relative;
+        width: 400px;
+        max-height: 275px;
+        background-color: white;
+        margin-bottom: 11px;
+        overflow: scroll;
+        border: 5px solid transparent;
+        border-radius: 5px;
+      }
+
+      .cartodb-popup-close-button {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        width: 26px;
+        height: 26px;
+        background: url('http://libs.cartodb.com/cartodb.js/v3/themes/img/light.png') no-repeat 0 -23px;
+        text-indent: -9999px;
+        font-size: 0;
+        line-height: 0;
+        opacity: 1;
+        text-transform: uppercase;
+        z-index: 3;
+      }
+
+      .cartodb-popup-tip-container {
+        position: absolute;
+        bottom: -3px;
+        left: 23px;
+        width: 16px;
+        height: 14px;
+        text-indent: -9999px;
+        font-size: 0;
+        line-height: 0;
+        opacity: 1;
+        z-index: 3;
+      }
+
+      blockquote {
+        display: hidden;
+      }
+
+      .cartodb-popup-content {
+        min-height: 80px;
+      }
     </style>
  
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
@@ -28,30 +75,67 @@
  
     <script>
       var INFOWINDOW_TEMPLATE = [
-      '<div class="cartodb-popup">',
-      '  <a href="#close" class="cartodb-popup-close-button close">x</a>',
-      '   <div class="cartodb-popup-content-wrapper">',
+      '<a href="#close" class="cartodb-popup-close-button close">x</a>',
+      '<div class="infowindow-custom">',
       '     <div class="cartodb-popup-content">',
-      '        <h4>Location: </h4>',
+      '        <br><strong>Location: </strong>',
       '        <div id="location">',
       '         <script>',
       '           figure_location({{content.data.row_ref}});',
       '         </scr' + 'ipt>',
       '         </div>',
-      '        <h4>Events: </h4>',
+      '        <br><strong>Events: </strong>',
+      '        <div id ="events">',
+      '        <script>',
+      '           give_events({{content.data.row_ref}});',
+      '        </scr' + 'ipt>',
+      '        </div>',
       '     </div>',
-      '   </div>',
       '   <div class="cartodb-popup-tip-container"></div>',
       '</div>'].join('');
 
+      //figure out what the location is and push it to infowindow's HTML
       function figure_location(ref) {
-        var sql = new cartodb.SQL({ user: 'user_name' });
+        if (ref==undefined) {
+          ref = 3;
+        }
+        var sql = new cartodb.SQL({ user: 'name' });
         
-        sql.execute("SELECT * FROM buildingpoints_copy WHERE cartodb_id = {{id}}", { id: ref })
+        sql.execute("SELECT * FROM table WHERE cartodb_id = {{id}}", { id: ref })
           .done(function(data) {
+            var loc = data.rows[0].bldg_name;
+            if (loc == null) {
+              loc = data.rows[0].event_loca;
+            }
             var div = document.getElementById('location');
-            div.innerHTML = div.innerHTML + data.rows[0].bldg_name;
-            console.log(data.rows);
+            div.innerHTML = div.innerHTML + loc;
+          })
+      }
+
+      //get the events associated with this location
+      function give_events(ref) {
+        if (ref==undefined) {
+          ref = 3;
+        }
+        var sql = new cartodb.SQL({ user: 'name' });
+        
+        sql.execute("SELECT * FROM table WHERE cartodb_id > 223 AND row_ref = {{id}}", { id: ref })
+          .done(function(data) {
+            if (data.total_rows !=0) {
+              for (i = 0; i < data.total_rows; i++) {
+                var name = data.rows[i].event_name;
+                var date = data.rows[i].event_date;
+                var loc = data.rows[i].event_loca;
+                var time = data.rows[i].event_time;
+                var event = date + " at " + time + ", " + name + " will be at " + loc;
+                var div = document.getElementById('events');
+                div.innerHTML = div.innerHTML + "<p>" + event + "</p>";
+              }
+            } else {
+              var div = document.getElementById('events');
+              div.innerHTML = div.innerHTML + " No events at this time.";
+
+            }
           })
       }
 
@@ -78,11 +162,11 @@
         
         //buildings layer
         cartodb.createLayer(map, {
-          user_name: 'user_name',
+          user_name: 'name',
           type: 'cartodb',
           sublayers: [{
-            sql: "SELECT * FROM campusbuildings2014_copy",
-            cartocss: '#campusbuildings2014_copy { polygon-fill: #0F3B82; polygon-opacity: 0.6; line-color: #FFF; line-width: 1; line-opacity: 1;}',
+            sql: "SELECT * FROM table",
+            cartocss: '#table { polygon-fill: #0F3B82; polygon-opacity: 0.6; line-color: #FFF; line-width: 1; line-opacity: 1;}',
             }]
           })
           .addTo(map) //ultimately not displayed
@@ -91,11 +175,11 @@
         
         //building points layer
         cartodb.createLayer(map, {
-          user_name: 'user_name',
+          user_name: 'name',
             type: 'cartodb',
             sublayers: [{
-              sql: "SELECT * FROM buildingpoints_copy",
-              cartocss: '#buildingpoints_copy { marker-fill: orange; marker-width: 8;}',
+              sql: "SELECT * FROM table",
+              cartocss: '#table { marker-fill: orange; marker-width: 8;}',
               interactivity: 'cartodb_id'
             }]
           })
@@ -107,7 +191,7 @@
             // when you create a visualization from scratch you need to 
             // use cdb.vis.Vis.addInfowindow to set the params
             // if you use viz.json the infowindow params are inside it
-            cdb.vis.Vis.addInfowindow(map, sublayer, ['cartodb_id','bldg_name'], {
+            cdb.vis.Vis.addInfowindow(map, sublayer, ['cartodb_id', 'row_ref','bldg_name'], {
             // we provide a nice default template, if you want yours uncomment this
               infowindowTemplate: INFOWINDOW_TEMPLATE
             });
