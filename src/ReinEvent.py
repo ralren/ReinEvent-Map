@@ -1,16 +1,16 @@
 '''
 Created on Oct 28, 2014
 
-@author: RenSol
+@author: Ren Delos Reyes and Sol Kim
 @description: This class is used to store event data from the Smith College events calendar to be mapped later on.
 
 CODE UPKEEP: Hi! This program was written by the RenSol programming team for the SAL lab at Smith.
              If you are reading this you are probably:
                  1) a person who is just browsing the code
                  2) casually updating the code
-                 3) WE GOT ERRORS UP THE WAZOO!
+                 3) SOMEONE WHO HAS GOT ERRORS UP THE WAZOO!
                  or
-                 4) THE PROGRAM IS BROKEN! EVERYTHING IS TERRIBLE! WHAT SHOULD I DO?!?!?!
+                 4) THE PROGRAM IS BROKEN! WHAT SHOULD I DO?!?!?!
              If you are 1, feel free to skip over this part. If you are 3, 4, or even 2, read on.
              
              We've left a lot of information about how to maintain this code, and we've created several tests
@@ -26,16 +26,16 @@ CODE UPKEEP: Hi! This program was written by the RenSol programming team for the
              debugging tips. Uncomment these blocks and read the print statements. These should give some insight
              on whether this specific block is what is causing the problems. We created tests for the most
              variable elements of our code that we have the least control over (ex. building names, RSS feed, etc.)
+             There will be # comments to tell you where to uncomment the test.  
              
+             The first test you chould check is "Parsed events" near the main function below.
 '''
+
 
 import feedparser
 import cartodb
-
-
-
 '''
-@summary: Event is a class that each singular event would be stored in. Each event object will then have several parameters containing info about the event.
+@summary: Event is a class that each singular event WILL be stored in. Each event object will then have several parameters containing information about the event.
 '''
 class Event:
     '''
@@ -43,7 +43,7 @@ class Event:
     @params: self,
              name, event's name
              location, where the event will take place
-             row_ref, building code associated with the location
+             row_ref, building code associated with the location (e.g. Neilson Browsing Room will have a row_ref pointing to Neilson Library)
              time, hour(s) the event will take place
              date, when the event will happen
     '''
@@ -58,12 +58,13 @@ class Event:
 
 '''
 @summary: Insert the data into the CartoDB account
-@params: 
+@params: events, list of event objects created
+         client, allows access to edit cartoDB table
 '''
 def insert_events(events, client):
     print "Inserting events..."
     for e in events:
-        command = "INSERT INTO buildingpoints_copy (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+        command = "INSERT INTO buildingpoints_smithevents (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
         client.sql(command)
     print "Done inserting events."   
 
@@ -82,7 +83,7 @@ def grab_RowDict(client):
 
     #gain access to the buildings table from CartoDB account
     try:
-        fields = client.sql('select * from buildingpoints_copy')
+        fields = client.sql('select * from buildingpoints_smithevents')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
@@ -113,24 +114,28 @@ def grab_RowDict(client):
         DESCRIPTION: IF THE CODE BREAKS FOR SOME REASON THIS TEST IS TO MAKE SURE THE ROW REFERENCES
                      ARE WORKING (FROM CARTODB)
         POSSIBLE BREAK REASONS: The buildings need to be updated periodically because names change
-                                (ex. a center gets named after someone), locations change, and new buildings
-                                are added almost annually. This means that certain 
+                                (e.g. a center gets named after someone), locations change, and new buildings
+                                are added almost annually. This means that certain locations will need to have their
+                                bldg_name (if it's a main building) or event_loca (if it's a location within a main building)
+                                updated in the buildingpoints_smithevents table
         DEBUGGING: Uncomment this test to check the row references. You will need the cartodb table
-                   the code is referencing (see main method to get api key for table). RowRef is
+                   the code is referencing (buildingpoints_smithevents). RowRef is
                    a column in the table used to attribute certain locations to a building.
                    For example, if Bass Hall was in row 5, Young Science Library would have a 5 in its row ref
                    column. Bass Hall would not have anything in its row ref column, because it is a major
                    building/event location (in cartodb). Make sure the row references are correct. This will
                    require some Googling and/or good knowledge of the campus locations
-        
         '''
         
-        '''     
+        
+        #START UNCOMMENTING HERE 
+        '''
         print location
         print fields['rows'][n]['cartodb_id'] 
         print row_ref
         print
         '''
+        # STOP UNCOMMENTING HERE
         
         '''RowRef TEST END '''
         
@@ -183,18 +188,28 @@ def parse_events(Row_Dict):
         
         keywords = location.upper().split() # split the location name so we can isolate the building name
                                             # making uppercase so we eliminate any errors from case sensitivity
-        ''' Find event location TEST START (pt 1)
+        ''' Find event location TEST START
         
-        DESCRIPTION: THIS IS A SPECIAL TEST!!! IT HAS 5 PARTS! IN ORDER TO USE THIS TEST, MAKE SURE YOU UNCOMMENT
-                     ALL 5 PARTS! AT THE END OF THE 5TH PART IT WILL SAY "Find event location TEST END"
-        POSSIBLE BREAK REASONS:
-        DEBUGGING: 
+        DESCRIPTION: THIS IS A SPECIAL TEST!!! IT HAS 5 PARTS! UNCOMMENT ALL 5 PARTS FOR THE BEST RESULTS!
+                     EACH PART HAS A DESCRIPTION OF WHAT THAT PART DOES.
+                     AT THE END OF THE 5TH PART IT WILL SAY "Find event location TEST END"
+        POSSIBLE BREAK REASONS: The series of these tests will give you insight into what events are being added and what events aren't. The most likely reason
+                                for an event not being added is the event location/building undergoing a name change (e.g. Center for Work and Life -> Wurtele Center).
+                                Other reasons could be minor spelling or errors (upper and lower case distinctions have be accounted for), the addition of a new event,
+                                or some other result of people changing stuff around. It will help to go to the smith college calendar site, check the event locations,
+                                and compare them to the buildings in the cartoDB table.
+        ''' 
+        
+        
+        ''' Find event location TEST (pt 1)
+            TEST 1 DESCRIPTION: This test will tell you what event from the event calendar is being 
         '''
-        
+        # START UNCOMMENTING HERE
         '''
         print
         print "EVENT NAME: " + name
         '''
+        # STOP UNCOMMENTING HERE
                 
         total_events += 1
         # loops through all building names to determine which one the event is located at        
@@ -203,14 +218,17 @@ def parse_events(Row_Dict):
             if keywords[0] in building:
                 possibleBuildings.append(building)       
                 
-                ''' Find event location TEST START (pt 2)'''
+                ''' Find event location TEST START (pt 2)
+                    TEST 2 DESCRIPTION: This test will tell you the possible buildings the event could be located in/at based on the first word of the event location from the website
+                '''
                
+               # START UNCOMMENTING HERE
                 ''' 
                 print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
                 print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                 print possibleBuildings
                 '''
-                
+                # STOP UNCOMMENTING HERE
               
         try:
             if len(possibleBuildings) > 1:
@@ -218,22 +236,40 @@ def parse_events(Row_Dict):
                     if keywords[1] in possibility:
                         building_name = possibility    
                         
-                        ''' Find event location TEST START (pt 3)'''
+                        ''' Find event location TEST START (pt 3)
+                            TEST 3 DESCRIPTION: This test will tell you whether a building has been matched to the event location.
+
                         '''
-                        print "CHECKED TWO FIRST WORDS AND GOT A MATCH. FOR NOW WE WILL USE THE MATCH BUT WILL HAVE TO ACCOUNT FOR MORE LATER"
+                        
+                        # START UNCOMMENTING HERE
                         '''
+                        print "CHECKED TWO FIRST WORDS AND GOT A MATCH. WE WILL USE THE MATCH."
+                        '''
+                        # STOP UNCOMMENTING HERE
             elif len(possibleBuildings) == 1:
                 building_name = possibleBuildings[0]
                
-                ''' Find event location TEST START (pt 4)'''
+                ''' Find event location TEST START (pt 3)
+                    TEST 4 DESCRIPTION: There is only one possible building that can be matched so we choose it
+                '''
+                        
+                # START UNCOMMENTING HERE
                 '''
                 print "ONLY ONE POSSIBLE BUILDING: " + building_name
                 '''
+                # STOP UNCOMMENTING HERE
+
             else:       
-                ''' Find event location TEST START (pt 5)'''
+                ''' Find event location TEST START (pt 3)
+                     TEST 5 DESCRIPTION: There are no possible buildings that can be matched. This is the test that probably indicates that a name has been changed
+                                         or there is a minor spelling or punctuation error
+                '''
+                        
+                # START UNCOMMENTING HERE
                 '''
                 print "NO POSSIBLE EVENT LOCATIONS"  # this is usually if there is a date instead of an event location
                 '''
+                # STOP UNCOMMENTING HERE
                 '''Find event location TEST END'''
 
             row_ref = Row_Dict[building_name] #look up row_ref using the building name and row_refdictionary
@@ -243,14 +279,6 @@ def parse_events(Row_Dict):
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
             date = date_time[0]
                 
-            '''
-            Possibly grab date and time from <pubdate> field rather than description[1]            
-            
-            date_time = entry.pubDate.split() #split pubDate's string into four parts
-            date = date_time[0] + date_time[1] + date_time[2] #join the first three parts
-            http://www.quora.com/How-can-I-convert-a-GMT-time-zone-into-local-time-in-Python
-            http://stackoverflow.com/questions/6288892/convert-datetime-format
-            '''
             #format time
             time = date_time[1].split()
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
@@ -263,9 +291,11 @@ def parse_events(Row_Dict):
             
             '''
             Events added TEST START
-            DESCRIPTION:
-            POSSIBLE BREAK REASONS:
-            DEBUGGING: 
+            DESCRIPTION: This test is in case an event on the website has weird information. This test is so you can see the information individually and pinpoint
+                         where the odd information is coming from.
+            POSSIBLE BREAK REASONS: Smith Calendar has formatted the information differently than when we started. It is not likely.
+            DEBUGGING: Double check insert_events function, and check the XML from the calendar's RSS feed. Contact the administrator in charge of the calendar
+                       if needed.
             '''
             
             '''
@@ -286,11 +316,12 @@ def parse_events(Row_Dict):
             
     ''' 
     Parsed events TEST START
-    DESCRIPTION:
-    POSSIBLE BREAK REASONS:
+    DESCRIPTION: This test is to see how many events have been added and how many events have been dropped. This is a good place to start to see if there
+                 are any issues with adding events. It also may give insight into why the visualization may or may not be showing very many events.
     DEBUGGING: 
     '''
-       
+
+    # START UNCOMMENTING HERE
     '''
     print
     print "Finished parsing..."            
@@ -301,6 +332,7 @@ def parse_events(Row_Dict):
     print "Total number of events parsed: "
     print total_events   
     '''
+    # STOP UNCOMMENTING HERE
             
     return events    
             
@@ -310,13 +342,13 @@ def parse_events(Row_Dict):
 def main():
 
     #user information
-    user = "" # empty string for privacy
-    api_key = "" # empty string for privacy
-    cartodb_domain = "" # empty string for privacy
+    user = "smithgis@smith.edu" # empty string for privacy
+    api_key = "388ff8dd9f9cbbfd5aa0a5a426951567d1052575" # empty string for privacy
+    cartodb_domain = "smithgis" # empty string for privacy
 
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    cl.sql("DELETE FROM buildingpoints_copy WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
+    cl.sql("DELETE FROM buildingpoints_smithevents WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
     Row_Dict = grab_RowDict(cl)
     insert_events(parse_events(Row_Dict), cl)
 
