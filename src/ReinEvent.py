@@ -144,9 +144,10 @@ def grab_RowDict(client):
 '''
 @summary: Create a list which will hold the events.
 @params: Row_Dict, dictionary to lookup buildings 
+         cl, allows us to edit the table 
 @return: events, list of events
 '''
-def parse_events(Row_Dict):
+def parse_events(Row_Dict, client):
     
     # variables to count events
     events_dropped = 0
@@ -273,7 +274,14 @@ def parse_events(Row_Dict):
                 '''Find event location TEST END'''
 
             row_ref = Row_Dict[building_name] #look up row_ref using the building name and row_refdictionary
-                            
+                        
+            # get num events from building name in table and store in a temp variable
+            # add 1 to that variable
+            # insert that variable into num events in the table by the row of the building name
+
+            command = "UPDATE buildingpoints_smithevents SET num_events = num_events+1 WHERE cartodb_id = {0}".format(row_ref)
+            client.sql(command) 
+            
             #format date
             date = description[1].split(",") #split string whenever it encounters a comma
             date_time = ",".join(date[:2]), ",".join(date[2:]) #only split until the second comma
@@ -322,7 +330,7 @@ def parse_events(Row_Dict):
     '''
 
     # START UNCOMMENTING HERE
-    '''
+    
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -331,7 +339,7 @@ def parse_events(Row_Dict):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-    '''
+    
     # STOP UNCOMMENTING HERE
             
     return events    
@@ -349,8 +357,9 @@ def main():
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
     cl.sql("DELETE FROM buildingpoints_smithevents WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
+    cl.sql("UPDATE buildingpoints_smithevents SET num_events = 0") 
     Row_Dict = grab_RowDict(cl)
-    insert_events(parse_events(Row_Dict), cl)
+    insert_events(parse_events(Row_Dict, cl), cl)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
