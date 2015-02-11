@@ -1,12 +1,17 @@
 ReinEvent-Map
 =============
 
-### DESCRIPTION
-This is a Revamp of the previous map events project for the Smith College Spatial Analysis Lab
+### Description
+This is a Revamp of the previous map events project for the Smith College Spatial Analysis Lab created by the RenSol programming team.
 
-### LINKS
-- Events: http://www.smith.edu/calendar/#/?i=3
-- Brief description of how the code works:
+Here (hyperlink)
+
+
+### Links
+- Events Calendar: http://www.smith.edu/calendar/#/?i=3
+- Event Visualization: 
+
+### How it Works:
 	- From ArcMap every event location (from the list of possible event locations to book for events) has been given a point by hand. 
 	- From CartoDB the code gets the list of buildings
 	- From the Events Calendar the code gets the XML code from the events page and parses through it.
@@ -24,6 +29,7 @@ This is a Revamp of the previous map events project for the Smith College Spatia
 - Go back to the code. Make sure you know how it works in case it crashes. Feel free to make more efficient.
 
 ### TO DO
-- add building column called "row ref" to tables. This column will be used to attribute certain locations to a building. For example, if Bass Hall was in row 5, Young Science Library would have a 5 in its row ref column. Bass Hall would not have anything in its row ref column, because it is a major building/event location (in cartodb)
-- change dictionary so it pulls category row ref instead of fm dictionary (in python)
-- adjust function to put events as rows in building points table
+- put a cap on how big points can get. ideally they would be relative to each other
+- think about having an info window explaining the project. hover or click.
+- want points to be over map. maybe check that out.
+- format infowindows
