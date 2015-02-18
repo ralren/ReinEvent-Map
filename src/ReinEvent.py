@@ -64,7 +64,7 @@ class Event:
 def insert_events(events, client):
     print "Inserting events..."
     for e in events:
-        command = "INSERT INTO buildingpoints_smithevents (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+        command = "INSERT INTO  (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
         client.sql(command)
     print "Done inserting events."   
 
@@ -83,7 +83,7 @@ def grab_RowDict(client):
 
     #gain access to the buildings table from CartoDB account
     try:
-        fields = client.sql('select * from buildingpoints_smithevents')
+        fields = client.sql('select * from ')
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
@@ -279,7 +279,7 @@ def parse_events(Row_Dict, client):
             # add 1 to that variable
             # insert that variable into num events in the table by the row of the building name
 
-            command = "UPDATE buildingpoints_smithevents SET num_events = num_events+1 WHERE cartodb_id = {0}".format(row_ref)
+            command = "UPDATE SET num_events = num_events+1 WHERE cartodb_id = {0}".format(row_ref)
             client.sql(command) 
             
             #format date
@@ -350,14 +350,14 @@ def parse_events(Row_Dict, client):
 def main():
 
     #user information
-    user = "smithgis@smith.edu" # empty string for privacy
-    api_key = "388ff8dd9f9cbbfd5aa0a5a426951567d1052575" # empty string for privacy
-    cartodb_domain = "smithgis" # empty string for privacy
+    user = "" # empty string for privacy
+    api_key = "" # empty string for privacy
+    cartodb_domain = "" # empty string for privacy
 
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    cl.sql("DELETE FROM buildingpoints_smithevents WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
-    cl.sql("UPDATE buildingpoints_smithevents SET num_events = 0") 
+    cl.sql("DELETE FROM WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
+    cl.sql("UPDATE  SET num_events = 0") 
     Row_Dict = grab_RowDict(cl)
     insert_events(parse_events(Row_Dict, cl), cl)
 
