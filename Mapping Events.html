@@ -99,7 +99,7 @@
         if (ref==undefined) {
           ref = 3;
         }
-        var sql = new cartodb.SQL({ user: 'name' });
+        var sql = new cartodb.SQL({ user: 'user' });
         
         sql.execute("SELECT * FROM table WHERE cartodb_id = {{id}}", { id: ref })
           .done(function(data) {
@@ -117,7 +117,7 @@
         if (ref==undefined) {
           ref = 3;
         }
-        var sql = new cartodb.SQL({ user: 'name' });
+        var sql = new cartodb.SQL({ user: 'user' });
         
         sql.execute("SELECT * FROM table WHERE cartodb_id > 223 AND row_ref = {{id}}", { id: ref })
           .done(function(data) {
@@ -141,14 +141,6 @@
 
       //create visualization at runtime
       function main() {
-          //var map;
-          //var my_city = new google.maps.LatLng(42.3181, -72.6381);
-          //var mapOptions = {
-            //zoom: 16,
-            //center: my_city,
-            
-          //};
-          //map = new google.maps.Map(document.getElementById('map'),  mapOptions);
 
         var map = L.map('map', {
           scrollWheelZoom: false,
@@ -156,13 +148,13 @@
           zoom: 16
         });
 
-        L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
-          attribution: 'Stamen'
+        L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',{
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
         }).addTo(map);
         
         //buildings layer
         cartodb.createLayer(map, {
-          user_name: 'name',
+          user_name: 'user',
           type: 'cartodb',
           sublayers: [{
             sql: "SELECT * FROM table",
@@ -175,11 +167,11 @@
         
         //building points layer
         cartodb.createLayer(map, {
-          user_name: 'name',
+          user_name: 'user',
             type: 'cartodb',
             sublayers: [{
               sql: "SELECT * FROM table",
-              cartocss: '#table { marker-fill: orange; marker-width: 8;}',
+              cartocss: '#table [num_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [num_events]; }',
               interactivity: 'cartodb_id'
             }]
           })
