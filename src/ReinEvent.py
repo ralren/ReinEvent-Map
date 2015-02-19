@@ -155,7 +155,7 @@ def parse_events(Row_Dict, client):
     total_events = 0 # should be events_dropped + events_added. to account for any errors
     
     #set up to parse through content in RSS feed
-    calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162")
+    calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=All+Events&mixin=14470%2c12187")
     #calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events")
     events = [] #list that holds the events
     
@@ -224,7 +224,7 @@ def parse_events(Row_Dict, client):
                 '''
                
                # START UNCOMMENTING HERE
-                ''' 
+                '''
                 print "FIRST WORD OF EVENT LOCATION: " + keywords[0]
                 print "FIRST WORD OF EVENT LOCATION MATCHES FIRST WORD OF: "
                 print possibleBuildings
@@ -275,10 +275,6 @@ def parse_events(Row_Dict, client):
 
             row_ref = Row_Dict[building_name] #look up row_ref using the building name and row_refdictionary
                         
-            # get num events from building name in table and store in a temp variable
-            # add 1 to that variable
-            # insert that variable into num events in the table by the row of the building name
-
             command = "UPDATE buildingpoints_smithevents SET num_events = num_events+1 WHERE cartodb_id = {0}".format(row_ref)
             client.sql(command) 
             
@@ -290,8 +286,11 @@ def parse_events(Row_Dict, client):
             #format time
             time = date_time[1].split()
             times = time[1].split("&nbsp;&ndash;&nbsp;") #get rid of the character " - " and split the string there
-            time = times[0] + " - " + times[1] #concatenate strings with the time    
-
+            try:
+                time = times[0] + " - " + times[1] #concatenate strings with the time    
+            except IndexError:
+                time = " " #concatenate strings with the time 
+                
             #create an Event object
             e = Event(name, location, row_ref, time, date)
             events.append(e)
@@ -317,12 +316,14 @@ def parse_events(Row_Dict, client):
             '''Events added TEST END'''
             
         except KeyError:    
-            # can't match the event, just keep going                   
+            # can't match the event, just keep going 
+            '''                  
             print "could not resolve event: " + name
             print
+            '''
             events_dropped+=1
             
-    ''' 
+    '''        
     Parsed events TEST START
     DESCRIPTION: This test is to see how many events have been added and how many events have been dropped. This is a good place to start to see if there
                  are any issues with adding events. It also may give insight into why the visualization may or may not be showing very many events.
@@ -330,7 +331,7 @@ def parse_events(Row_Dict, client):
     '''
 
     # START UNCOMMENTING HERE
-    
+    '''
     print
     print "Finished parsing..."            
     print "Number of events added: "
@@ -339,7 +340,7 @@ def parse_events(Row_Dict, client):
     print events_dropped
     print "Total number of events parsed: "
     print total_events   
-    
+    '''
     # STOP UNCOMMENTING HERE
             
     return events    
