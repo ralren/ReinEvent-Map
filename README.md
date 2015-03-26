@@ -12,7 +12,7 @@ The visualization can be viewed here: (hyperlink)
 
 Feel free to click around and see what is happening on Smith's campus (updated daily). And check out the info below to see how it works!
 
-- Ren and Sol
+~ Ren and Sol
 
 
 ### Links
