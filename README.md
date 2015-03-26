@@ -22,14 +22,19 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 ### How it Works:
 	- From ArcMap every event location (from the list of possible event
       locations to book for events) has been given a point by hand 
+      
 	- From CartoDB the code gets the list of buildings at Smith College
+    
 	- From the Events Calendar the code gets the XML code from the events
       page and parses through it. There are five catagories of events
       that it pulls information from: Featured, Student Interest,
       Lectures and Symposia, Multicultural Events, and Atheletic Events
+      
 	- The code pushes all the event info into the CartoDB database
+    
     - The code then maps all the events to their respective locations
       (a building on campus).
+      
 	- The visualization can then be viewed at (hyperlink) with an updated
       list of events.
     	- NOTE: The points are sized relative to the number of events at
@@ -37,6 +42,7 @@ Feel free to click around and see what is happening on Smith's campus (updated d
         - NOTE: Each point can be selected to see what events are happening
         		at a specific building, and other information pertinant to
                 that event (e.g. date, time, location)
+                
     - The map is scheduled to update daily
 
 
