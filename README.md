@@ -2,9 +2,13 @@ ReinEvent-Map
 =============
 
 ### Description
-This is a Revamp of the previous map events project for the Smith College Spatial Analysis Lab created by the RenSol programming team.
+This is a revamp of the previous map events project for the Smith College Spatial Analysis Lab created by the RenSol programming team.
 
-Here (hyperlink)
+This Map is a visualization of all the events happening at Smith College.
+
+There are five catagories of events that can be viewed: Featured, Student Interest,Lectures and Symposia, Multicultural Events, and Atheletic Events
+
+The visualization can be viewed here: (hyperlink)
 
 
 ### Links
@@ -14,7 +18,7 @@ Here (hyperlink)
 ### How it Works:
 	- From ArcMap every event location (from the list of possible event
       locations to book for events) has been given a point by hand 
-	- From CartoDB the code gets the list of buildings
+	- From CartoDB the code gets the list of buildings at Smith College
 	- From the Events Calendar the code gets the XML code from the events
       page and parses through it. There are five catagories of events
       that it pulls information from: Featured, Student Interest,
