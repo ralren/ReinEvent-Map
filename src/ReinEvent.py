@@ -31,7 +31,7 @@ CODE UPKEEP: Hi! This program was written by the RenSol programming team for the
              The first test you chould check is "Parsed events" near the main function below.
 '''
 
-
+import Private              # file with sensitive information
 import feedparser
 import cartodb
 '''
@@ -61,13 +61,37 @@ class Event:
 @params: events, list of event objects created
          client, allows access to edit cartoDB table
 '''
-def insert_events(events, client):
-    print "Inserting events..."
-    for e in events:
-        command = "INSERT INTO  (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
-        client.sql(command)
-    print "Done inserting events."   
-
+def insert_events(events, client, rssFeed):
+    #try:
+        #print "Inserting events..."
+        for e in events:
+            try:
+                #print e.name
+                ''' TABLE NAMES REMOVED FOR PRIVACY'''
+                if rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Student+Interest&filter3=_Confirmed_&filterfield3=2591&mixin=12185":
+                    command = "INSERT INTO student_events (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+                elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Lectures+%2f+Symposia&mixin=12178":
+                    command = "INSERT INTO lecture_events (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+                elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Athletic+Events&filter3=_Confirmed_&filterfield3=2591&mixin=12172":
+                    command = "INSERT INTO athletic_events (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+                elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Multicultural+Events&mixin=12180":
+                    command = "INSERT INTO multicultural_events (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+                elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162":
+                    command = "INSERT INTO featured_events (event_name, event_loca, event_date, event_time, row_ref) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')".format(e.name, e.location, e.date, e.time, e.row_ref)
+                else:
+                    print
+                
+                client.sql(command)
+            except Exception:
+                #print "Could not insert: " + e.name
+       
+        
+                '''        
+        print "Done inserting events."   
+        print
+        print
+        '''
+  
 
 '''
 @summary Grab buildings and their associated row references to place in a dictionary to be looked up later.
@@ -83,7 +107,10 @@ def grab_RowDict(client):
 
     #gain access to the buildings table from CartoDB account
     try:
-        fields = client.sql('select * from ')
+        
+        ''' TABLE NAMES REMOVED FOR PRIVACY'''
+        fields = client.sql('select * from buildingpoints_smithevents')
+        
     except cartodb.CartoDBException as e:
         print ("some error occurred", e)
      
@@ -127,7 +154,6 @@ def grab_RowDict(client):
                    require some Googling and/or good knowledge of the campus locations
         '''
         
-        
         #START UNCOMMENTING HERE 
         '''
         print location
@@ -147,7 +173,7 @@ def grab_RowDict(client):
          cl, allows us to edit the table 
 @return: events, list of events
 '''
-def parse_events(Row_Dict, client):
+def parse_events(Row_Dict, client, rssFeed):
     
     # variables to count events
     events_dropped = 0
@@ -155,8 +181,7 @@ def parse_events(Row_Dict, client):
     total_events = 0 # should be events_dropped + events_added. to account for any errors
     
     #set up to parse through content in RSS feed
-    calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=All+Events&mixin=14470%2c12187")
-    #calendar = feedparser.parse("http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events")
+    calendar = feedparser.parse(rssFeed)
     events = [] #list that holds the events
     
     #parse through each event in the RSS feed which is listed as an entry
@@ -218,7 +243,6 @@ def parse_events(Row_Dict, client):
             
             if keywords[0] in building:
                 possibleBuildings.append(building)       
-                
                 ''' Find event location TEST START (pt 2)
                     TEST 2 DESCRIPTION: This test will tell you the possible buildings the event could be located in/at based on the first word of the event location from the website
                 '''
@@ -274,12 +298,22 @@ def parse_events(Row_Dict, client):
                 '''Find event location TEST END'''
 
             row_ref = Row_Dict[building_name] #look up row_ref using the building name and row_refdictionary
-                        
-            # get num events from building name in table and store in a temp variable
-            # add 1 to that variable
-            # insert that variable into num events in the table by the row of the building name
 
-            command = "UPDATE SET num_events = num_events+1 WHERE cartodb_id = {0}".format(row_ref) # TABLE NAME DELETED FOR SECURITY
+
+            ''' TABLE NAMES REMOVED FOR PRIVACY'''
+            if rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Student+Interest&filter3=_Confirmed_&filterfield3=2591&mixin=12185":
+                command = "UPDATE buildingpoints_smithevents SET student_events = student_events+1 WHERE cartodb_id = {0}".format(row_ref) # student events
+            elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Lectures+%2f+Symposia&mixin=12178":
+                command = "UPDATE buildingpoints_smithevents SET lecture_events = lecture_events+1 WHERE cartodb_id = {0}".format(row_ref) # lectures events
+            elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Athletic+Events&filter3=_Confirmed_&filterfield3=2591&mixin=12172":
+                command = "UPDATE buildingpoints_smithevents SET athletic_events = athletic_events+1 WHERE cartodb_id = {0}".format(row_ref) # athletic events
+            elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Multicultural+Events&mixin=12180":
+                command = "UPDATE buildingpoints_smithevents SET multicultural_events = multicultural_events+1 WHERE cartodb_id = {0}".format(row_ref) # multicultural events
+            elif rssFeed == "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162":
+                command = "UPDATE buildingpoints_smithevents SET featured_events = featured_events+1 WHERE cartodb_id = {0}".format(row_ref) # featured events
+            else:
+                print("butts")
+
             client.sql(command) 
             
             #format date
@@ -321,10 +355,11 @@ def parse_events(Row_Dict, client):
             
         except KeyError:    
             # can't match the event, just keep going 
-            '''                  
-            print "could not resolve event: " + name
-            print
             '''
+            print keywords[0]            
+            print "could not resolve event: " + name
+            '''
+            
             events_dropped+=1
             
     '''        
@@ -337,13 +372,14 @@ def parse_events(Row_Dict, client):
     # START UNCOMMENTING HERE
     '''
     print
-    print "Finished parsing..."            
+    print "Finished parsing... " + rssFeed         
     print "Number of events added: "
     print events_added
     print "Number of events dropped: "
     print events_dropped
     print "Total number of events parsed: "
-    print total_events   
+    print total_events
+    print   
     '''
     # STOP UNCOMMENTING HERE
             
@@ -354,17 +390,41 @@ def parse_events(Row_Dict, client):
 '''
 def main():
 
-    #user information
-    user = "" # empty string for privacy
-    api_key = "" # empty string for privacy
-    cartodb_domain = "" # empty string for privacy
+    ''' USER INFO REMOVED FOR PRIVACY'''
+    
+    user = Private.USER
+    api_key = Private.API_KEY
+    cartodb_domain = Private.CARTODB_DOMAIN
+    
+    ''' RSS FEEDS REMOVED FOR PRIVACY'''
+    student_events = "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Student+Interest&filter3=_Confirmed_&filterfield3=2591&mixin=12185"
+    lecture_events = "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Lectures+%2f+Symposia&mixin=12178"
+    athletic_events = "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Athletic+Events&filter3=_Confirmed_&filterfield3=2591&mixin=12172"
+    multicultural_events = "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Multicultural+Events&mixin=12180"
+    featured_events = "http://25livepub.collegenet.com/calendars/scevents.rss?filterview=Featured+Events&mixin=12162"
 
     #initialize CartoDB client to deal with SQL commands
     cl = cartodb.CartoDBAPIKey(api_key, cartodb_domain)
-    cl.sql("DELETE FROM WHERE cartodb_id > 223") #CHANGE!!! 224 is the last row for the buildingpoints_copy up until we add events to the table
-    cl.sql("UPDATE  SET num_events = 0") 
+    
+    ''' TABLES REMOVED FOR PRIVACY '''
+    cl.sql("DELETE FROM student_events")
+    cl.sql("DELETE FROM lecture_events") 
+    cl.sql("DELETE FROM athletic_events") 
+    cl.sql("DELETE FROM multicultural_events") 
+    cl.sql("DELETE FROM featured_events") 
+
+    cl.sql("UPDATE buildingpoints_smithevents SET student_events = 0")
+    cl.sql("UPDATE buildingpoints_smithevents SET lecture_events = 0") 
+    cl.sql("UPDATE buildingpoints_smithevents SET athletic_events = 0") 
+    cl.sql("UPDATE buildingpoints_smithevents SET multicultural_events = 0") 
+    cl.sql("UPDATE buildingpoints_smithevents SET featured_events = 0") 
+    
     Row_Dict = grab_RowDict(cl)
-    insert_events(parse_events(Row_Dict, cl), cl)
+    insert_events(parse_events(Row_Dict, cl, student_events), cl, student_events)
+    insert_events(parse_events(Row_Dict, cl, lecture_events), cl, lecture_events)
+    insert_events(parse_events(Row_Dict, cl, athletic_events), cl, athletic_events)
+    insert_events(parse_events(Row_Dict, cl, multicultural_events), cl, multicultural_events)
+    insert_events(parse_events(Row_Dict, cl, featured_events), cl, featured_events)
 
 #calls the main function upon importing module
 if __name__ == '__main__':
