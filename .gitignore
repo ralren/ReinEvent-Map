@@ -1,3 +1,6 @@
 .idea/
 out/
 wecode_git_workshop.iml
+
+#ignore file with case sensitive information
+Private.py
