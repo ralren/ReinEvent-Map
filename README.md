@@ -12,10 +12,14 @@ Here (hyperlink)
 - Event Visualization: 
 
 ### How it Works:
-	- From ArcMap every event location (from the list of possible event locations to book for events) has been given a point by hand. 
+	- From ArcMap every event location (from the list of possible event
+      locations to book for events) has been given a point by hand. 
 	- From CartoDB the code gets the list of buildings
-	- From the Events Calendar the code gets the XML code from the events page and parses through it.
-	- The code can identify where the approximate location of each field (e.g. location, building name) and assigns the values to an event (a class we created).
+	- From the Events Calendar the code gets the XML code from the events
+      page and parses through it. There are five catagories of events
+      that it pulls information from: Featured, Lectures & Symposia,
+      
+	- The code pushes all the event info into the CartoDB database
 	- You end up with a list of events to create the map.
 
 
