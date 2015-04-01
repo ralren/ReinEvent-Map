@@ -58,6 +58,36 @@
       .cartodb-popup-content {
         min-height: 80px;
       }
+
+      #category_selector {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 0;
+      }
+
+      #category_selector ul {
+        padding: 0; margin: 0;
+        list-style-type: none;
+      }
+
+      #category_selector li {
+        border-bottom: 1px solid #999;
+        padding: 15px 30px;
+        font-family: "Helvetica", Arial;
+        font-size: 13px;
+        color: #444;
+        cursor: auto;
+      }
+
+      #category_selector li:hover {
+        background-color: #F0F0F0;
+        cursor: pointer;
+      }
+
+      #category_selector li.selected {
+        background-color: #EEE;
+      }
     </style>
  
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
@@ -67,13 +97,62 @@
   </head>
   <body>
     <div id="map"></div>
+    <div id="category_selector" class="cartodb-infobox">
+      <ul>
+        <li name="featured_events">Featured</li>
+        <li name="student_events">Student Interest</li>
+        <li name="lecture_events">Lectures and Sypnosia</li>
+        <li name="multicultural_events">Multicultural Events</li>
+        <li name="athletic_events">Athletic Events</li>
+      </ul>
+    </div>
  
     <!-- include google maps library *before* load cartodb.js -->
     <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <!-- include cartodb.js library -->
     <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.uncompressed.js"></script>
  
+    
+
     <script>
+
+      //global variable
+      var cur_table = ""
+
+      // create category selector
+      function createSelector(sublayer) {
+        
+        var $options = $('#category_selector li');
+        console.log("BLERG")
+        $options.click(function(e) {
+          // get the name of the selected category
+          var $li = $(e.target);
+          var category = $li.attr('name');
+          cur_table = category;
+
+          // deselect all and select the clicked one
+          $options.removeClass('selected');
+          $li.addClass('selected');
+          //depending on the category - change css and change table looking at
+          if (category == 'featured_events') {
+            sublayer.setCartoCSS('#buildingpoints_smithevents [featured_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [featured_events]; }');
+
+          } else if (category == 'student_events') {
+            sublayer.setCartoCSS('#buildingpoints_smithevents [student_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [student_events]; }');
+
+          } else if (category == 'lecture_events') {
+            sublayer.setCartoCSS('#buildingpoints_smithevents [lecture_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [lecture_events]; }');
+            
+          } else if (category == 'multicultural_events') {
+            sublayer.setCartoCSS('#buildingpoints_smithevents [multicultural_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [multicultural_events]; }');
+            
+          } else { //athletic events
+            sublayer.setCartoCSS('#buildingpoints_smithevents [athletic_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [athletic_events]; }');
+          }
+        });
+      }
+
+
       var INFOWINDOW_TEMPLATE = [
       '<a href="#close" class="cartodb-popup-close-button close">x</a>',
       '<div class="infowindow-custom">',
@@ -96,12 +175,9 @@
 
       //figure out what the location is and push it to infowindow's HTML
       function figure_location(ref) {
-        if (ref==undefined) {
-          ref = 3;
-        }
         var sql = new cartodb.SQL({ user: 'user' });
         
-        sql.execute("SELECT * FROM table WHERE cartodb_id = {{id}}", { id: ref })
+        sql.execute("SELECT * FROM buildingpoints_smithevents WHERE cartodb_id = {{id}}", { id: ref })
           .done(function(data) {
             var loc = data.rows[0].bldg_name;
             if (loc == null) {
@@ -114,12 +190,9 @@
 
       //get the events associated with this location
       function give_events(ref) {
-        if (ref==undefined) {
-          ref = 3;
-        }
         var sql = new cartodb.SQL({ user: 'user' });
         
-        sql.execute("SELECT * FROM table WHERE cartodb_id > 223 AND row_ref = {{id}}", { id: ref })
+        sql.execute("SELECT * FROM {{id}} WHERE  row_ref = {{id2}}", {id: cur_table, id2: ref})
           .done(function(data) {
             if (data.total_rows !=0) {
               for (i = 0; i < data.total_rows; i++) {
@@ -157,8 +230,8 @@
           user_name: 'user',
           type: 'cartodb',
           sublayers: [{
-            sql: "SELECT * FROM table",
-            cartocss: '#table { polygon-fill: #0F3B82; polygon-opacity: 0.6; line-color: #FFF; line-width: 1; line-opacity: 1;}',
+            sql: "SELECT * FROM smith_buildings",
+            cartocss: '#smith_buildings { polygon-fill: #0F3B82; polygon-opacity: 0.6; line-color: #FFF; line-width: 1; line-opacity: 1;}',
             }]
           })
           .addTo(map) //ultimately not displayed
@@ -170,8 +243,8 @@
           user_name: 'user',
             type: 'cartodb',
             sublayers: [{
-              sql: "SELECT * FROM table",
-              cartocss: '#table [num_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [num_events]; }',
+              sql: "SELECT * FROM buildingpoints_smithevents",
+              cartocss: '#buildingpoints_smithevents { }',
               interactivity: 'cartodb_id'
             }]
           })
@@ -188,6 +261,7 @@
               infowindowTemplate: INFOWINDOW_TEMPLATE
             });
             sublayer.setInteraction(true);
+            createSelector(sublayer)
           })//end of second on function
       }//end main
  
