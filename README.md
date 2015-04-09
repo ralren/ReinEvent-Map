@@ -1,41 +1,35 @@
 ReinEvent-Map
 =============
-
-### Description
+## Introduction
 Hello friend!
 
 This is a revamp of the previous map events project for the Smith College Spatial Analysis Lab created by the RenSol programming team. It is essentially a visualization of all the events happening at Smith College.
 
-There are five catagories of events that can be viewed: Featured, Student Interest,Lectures and Symposia, Multicultural Events, and Atheletic Events.
+There are five categories of events that can be viewed: Featured, Student Interest, Lectures and Symposia, Multicultural Events, and Athletic Events.
 
-The visualization can be viewed here: (hyperlink)
+The visualization can be viewed [here](http://www.science.smith.edu/departments/sal/devel/MappingEvents.html).
 
 Feel free to click around and see what is happening on Smith's campus (updated daily). And check out the info below to see how it works!
 
 ~ Ren and Sol
 
-
-### Links
-- Events Calendar: http://www.smith.edu/calendar/#/?i=3
-- Event Visualization: 
-
-### How it Works:
+## How it Works
 	- From ArcMap every event location (from the list of possible event
       locations to book for events) has been given a point by hand 
       
 	- From CartoDB the code gets the list of buildings at Smith College
     
-	- From the Events Calendar the code gets the XML code from the events
-      page and parses through it. There are five catagories of events
+	- From the [Events Calendar](http://www.smith.edu/calendar/#/?i=3) the code gets the XML code from the events
+      page and parses through it. There are five categories of events
       that it pulls information from: Featured, Student Interest,
-      Lectures and Symposia, Multicultural Events, and Atheletic Events
+      Lectures and Symposia, Multicultural Events, and Athletic Events
       
 	- The code pushes all the event info into the CartoDB database
     
     - The code then maps all the events to their respective locations
       (a building on campus).
       
-	- The visualization can then be viewed at (hyperlink) with an updated
+	- The visualization can then be viewed [here](http://www.science.smith.edu/departments/sal/devel/MappingEvents.html) with an updated
       list of events.
     	- NOTE: The points are sized relative to the number of events at
         		that location.
@@ -43,16 +37,10 @@ Feel free to click around and see what is happening on Smith's campus (updated d
         		at a specific building, and other information pertinant to
                 that event (e.g. date, time, location)
                 
-    - The map is scheduled to update daily
+    - The map is scheduled to update daily at 6:15 AM
 
 
-### POSSIBLE UPDATES
-- fix navigation between 5 event pages
-- add an info window explaining the project. hover or click.
-- want points to be over map. maybe check that out. is inconsistent
-
-
-### UPDATE AND MAINTENANCE INSTRUCTIONS
+## UPDATE AND MAINTENANCE INSTRUCTIONS
 - Email the Events Management Office and get an updated list of events
 - Briefly look over the code. See what you’re up against. Read the documentation.
 	- NOTE: the code is presently in Python2
