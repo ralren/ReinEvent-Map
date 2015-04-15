@@ -49,3 +49,10 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 	- NOTE: you will find a lot of event locations you never could have imagined. You can technically book a vending machine.
 - Go back to the code. Make sure you know how it works in case it crashes
   (though this is highly unlikely). Feel free to make more efficient.
+  
+## TO FIX
+- FIX SCROLL THING ON INFO WINDOWS
+- FIX FONT SIZE IN INFO WINDOWS
+- CREATE BACK BUTTON
+- FIX LOCATION STUFF (when they’re all clumped together)
+
