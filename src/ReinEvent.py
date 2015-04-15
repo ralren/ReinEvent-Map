@@ -31,7 +31,7 @@ CODE UPKEEP: Hi! This program was written by the RenSol programming team for the
              The first test you chould check is "Parsed events" near the main function below.
 '''
 
-import Private              # file with sensitive information
+import Private    # file with sensitive information
 import feedparser
 import cartodb
 '''
@@ -86,7 +86,7 @@ def insert_events(events, client, rssFeed):
                 #print "Could not insert: " + e.name
        
         
-                '''        
+                '''          
         print "Done inserting events."   
         print
         print
@@ -327,7 +327,7 @@ def parse_events(Row_Dict, client, rssFeed):
             try:
                 time = times[0] + " - " + times[1] #concatenate strings with the time    
             except IndexError:
-                time = " " #concatenate strings with the time 
+                time = "TBA" #concatenate strings with the time 
                 
             #create an Event object
             e = Event(name, location, row_ref, time, date)

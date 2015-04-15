@@ -2,9 +2,22 @@
 <html>
   <head>
     <title>ReinEvent map | CartoDB.js</title>
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./slide.js"></script>
+
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
     <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    
+
+     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/themes/css/cartodb.css" />
+     <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+
+
+
+
     <style>
       html, body, #map {
         height: 100%;
@@ -21,6 +34,7 @@
         overflow: scroll;
         border: 5px solid transparent;
         border-radius: 5px;
+        font-family: "Helvetica", Arial;
       }
 
       .cartodb-popup-close-button {
@@ -36,6 +50,7 @@
         opacity: 1;
         text-transform: uppercase;
         z-index: 3;
+
       }
 
       .cartodb-popup-tip-container {
@@ -75,7 +90,7 @@
         border-bottom: 1px solid #999;
         padding: 15px 30px;
         font-family: "Helvetica", Arial;
-        font-size: 13px;
+        font-size: 14px;
         color: #444;
         cursor: auto;
       }
@@ -87,6 +102,60 @@
 
       #category_selector li.selected {
         background-color: #EEE;
+      }
+
+      #rotated_text {
+        position: absolute;
+        /*top: 43px;
+        left: -22px;*/
+        top: 45px;
+        left: -76px;
+        color: #444;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        width: 200px; /*90px;*/
+        height: 29px;
+         /* Safari */
+        -webkit-transform: rotate(-90deg);
+        /* Firefox */
+        -moz-transform: rotate(-90deg);
+        /* IE */
+        -ms-transform: rotate(-90deg);
+        /* Opera */
+        -o-transform: rotate(-90deg);
+        /* Internet Explorer */
+        filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+      }
+
+      .handle {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        top: -1px !important;
+      }
+
+      .tab { margin-left: 40px; }
+
+      #slide_out_info {
+        width: 500px;  /*350*/
+        height: 50%;
+        border-radius: 0 0 10px 0px;
+        background: #ccc;
+        border: 1px solid #a4a2a2;
+        background-color: white;
+        opacity: 1;
+        z-index: 1001;
+      }
+
+      .content {
+        height: 100%;
+        width: auto;
+        overflow-x: hidden;
+        overflow-y: scroll;
+      }
+
+      .text {
+        padding: 20px;
       }
     </style>
  
@@ -107,15 +176,78 @@
       </ul>
     </div>
  
+    <!-- "about" tab -->
+    <div id="slide_out_info">
+      <a class="handle" href="#">
+        <span id="rotated_text">ABOUT THIS MAP</span>
+      </a>
+      <div class="content">
+        <!-- <div class="text" style="font-family:'Montserrat', sans-serif; font-size: 14px;"> -->
+        <div class="text" style="font-family: 'Helvetica', sans-serif; font-size: 16px;">
+
+          <h3 style="color: #366ab2">Hello friend!</h3>
+            </br>
+            <p>
+              This map is a visualization of events happening at Smith College.
+            </p>
+            </br>
+            <p>
+              There are the five categories of events you can view:
+              <p>
+                </br>
+                <ul class="tab">
+                  <li>Featured</li>
+                  <li>Student Interest</li>
+                  <li>Lectures and Symposia</li>
+                  <li>Multicultural Events</li>
+                  <li>Athletic Events</li>
+                </ul>
+              </p>
+            </p>
+            </br>
+            <p>
+              Pick on a category tab to get orange dots that appear where an event is taking place. The bigger the dot, the more events are taking place at that location.
+            </p>
+            </br>
+            <p>
+              Click on the dot, and you'll get a list of events happening there!
+            </p>
+            </br>
+            <p>
+              Feel free to look around and see what is happening on Smith's campus (updated daily).
+            </p>
+
+            </br>
+            <p>
+              And check out our <a href="https://github.com/sessionista/ReinEvent-Map" target="_blank">github</a> to find out how our map works!
+            </p>
+            </br>
+            <p>
+              Happy clicking!
+            </p>
+            </br>
+            <p>
+              Ren and Sol
+            </p>
+            <p>
+              Spatial Analysis Lab
+            </p>
+
+            
+          <!-- <img height="auto" width="460" src="./infographic.png"> -->
+          <br>
+          <!--<i style="font-size: 11px"><br>Map programmed by Anna Young (Yale College '16) <br>Design by Peter Hirsch (MEM '15 candidate) </i>--><br><br>
+          
+        </div>
+      </div>
+    </div>
+
     <!-- include google maps library *before* load cartodb.js -->
     <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
     <!-- include cartodb.js library -->
     <script src="http://libs.cartocdn.com/cartodb.js/v3/cartodb.uncompressed.js"></script>
- 
-    
 
     <script>
-
       //global variable
       var cur_table = ""
 
@@ -135,19 +267,19 @@
           $li.addClass('selected');
           //depending on the category - change css and change table looking at
           if (category == 'featured_events') {
-            sublayer.setCartoCSS('#buildingpoints_smithevents [featured_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [featured_events]; }');
+            sublayer.setCartoCSS('#buildingpoints_smithevents [featured_events > 0] { marker-fill: orange; marker-width: 8 + 2 * [featured_events]; }');
 
           } else if (category == 'student_events') {
-            sublayer.setCartoCSS('#buildingpoints_smithevents [student_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [student_events]; }');
+            sublayer.setCartoCSS('#buildingpoints_smithevents [student_events > 0] { marker-fill: orange; marker-width: 8 + 2 * [student_events]; }');
 
           } else if (category == 'lecture_events') {
-            sublayer.setCartoCSS('#buildingpoints_smithevents [lecture_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [lecture_events]; }');
+            sublayer.setCartoCSS('#buildingpoints_smithevents [lecture_events > 0] { marker-fill: orange; marker-width: 8 + 2 * [lecture_events]; }');
             
           } else if (category == 'multicultural_events') {
-            sublayer.setCartoCSS('#buildingpoints_smithevents [multicultural_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [multicultural_events]; }');
+            sublayer.setCartoCSS('#buildingpoints_smithevents [multicultural_events > 0] { marker-fill: orange; marker-width: 8 + 2 * [multicultural_events]; }');
             
           } else { //athletic events
-            sublayer.setCartoCSS('#buildingpoints_smithevents [athletic_events > 0] { marker-fill: orange; marker-width: 8 + 1 * [athletic_events]; }');
+            sublayer.setCartoCSS('#buildingpoints_smithevents [athletic_events > 0] { marker-fill: orange; marker-width: 8 + 2 * [athletic_events]; }');
           }
         });
       }
@@ -157,13 +289,13 @@
       '<a href="#close" class="cartodb-popup-close-button close">x</a>',
       '<div class="infowindow-custom">',
       '     <div class="cartodb-popup-content">',
-      '        <br><strong>Location: </strong>',
+      '        <br><h3><strong>Location: </strong></h3>',
       '        <div id="location">',
       '         <script>',
       '           figure_location({{content.data.row_ref}});',
       '         </scr' + 'ipt>',
       '         </div>',
-      '        <br><strong>Events: </strong>',
+      '        <br><h3><strong>Events: </strong></h3>',
       '        <div id ="events">',
       '        <script>',
       '           give_events({{content.data.row_ref}});',
@@ -175,7 +307,7 @@
 
       //figure out what the location is and push it to infowindow's HTML
       function figure_location(ref) {
-        var sql = new cartodb.SQL({ user: 'user' });
+        var sql = new cartodb.SQL({ user: 'smithgis' });
         
         sql.execute("SELECT * FROM buildingpoints_smithevents WHERE cartodb_id = {{id}}", { id: ref })
           .done(function(data) {
@@ -190,7 +322,7 @@
 
       //get the events associated with this location
       function give_events(ref) {
-        var sql = new cartodb.SQL({ user: 'user' });
+        var sql = new cartodb.SQL({ user: 'smithgis' });
         
         sql.execute("SELECT * FROM {{id}} WHERE  row_ref = {{id2}}", {id: cur_table, id2: ref})
           .done(function(data) {
@@ -200,9 +332,12 @@
                 var date = data.rows[i].event_date;
                 var loc = data.rows[i].event_loca;
                 var time = data.rows[i].event_time;
-                var event = date + " at " + time + ", " + name + " will be at " + loc;
+                //var event = date + " at " + time + ", " + name + " will be at " + loc;
+                var event = "<strong>" + name + "</strong>" + "</br>" +
+                            "Date & Time: " + date + " @ " + time + "</br>" +
+                            "Location: " + loc;
                 var div = document.getElementById('events');
-                div.innerHTML = div.innerHTML + "<p>" + event + "</p>";
+                div.innerHTML = div.innerHTML + "</br>" + "<p>" + event + "</p>";
               }
             } else {
               var div = document.getElementById('events');
@@ -227,7 +362,7 @@
         
         //buildings layer
         cartodb.createLayer(map, {
-          user_name: 'user',
+          user_name: 'smithgis',
           type: 'cartodb',
           sublayers: [{
             sql: "SELECT * FROM smith_buildings",
@@ -240,7 +375,7 @@
         
         //building points layer
         cartodb.createLayer(map, {
-          user_name: 'user',
+          user_name: 'smithgis',
             type: 'cartodb',
             sublayers: [{
               sql: "SELECT * FROM buildingpoints_smithevents",
@@ -267,5 +402,18 @@
  
       window.onload = main;
     </script>
+
+     <!-- animation for "about "tab slide out -->
+     <script type="text/javascript">
+       //have the info tab slide out
+      $('#slide_out_info').tabSlideOut({
+        tabHandle: '.handle',                //class of the element
+        height: '190px',                     //height of tab (110)
+        width: '30px',                       //width of tab 
+        tabLocation: 'left',                 //location
+        speed: 400,                          //speed of animation
+        action: 'click',                   
+      });
+    </script>  
   </body>
 </html>
