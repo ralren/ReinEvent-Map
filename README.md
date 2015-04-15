@@ -55,4 +55,5 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - FIX FONT SIZE IN INFO WINDOWS
 - CREATE BACK BUTTON
 - FIX LOCATION STUFF (when they’re all clumped together)
+- EMAIL THOSE PEOPLE ABOUT THE DOTS BEING BEHIND THE MAP SOMETIMES. WHAT'S UP WITH THAT?
 
