@@ -50,6 +50,14 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - Go back to the code. Make sure you know how it works in case it crashes
   (though this is highly unlikely). Feel free to make more efficient.
   
+## TASK SCHEDULER
+- Task: CalendarEvents
+- Triggers: Daily @ 12:00am
+- Actions: Start a program
+	- Program/script: path to python.exe (e.g. C:/Python27/python.exe)
+    - Add arguments (optional): path to python code (e.g. C:/Desktop/ReinEvent.py)
+- Create/Update task on Jon's account
+  
 ## TO FIX
 - FIX SCROLL THING ON INFO WINDOWS
 - FIX FONT SIZE IN INFO WINDOWS
@@ -57,5 +65,6 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - CREATE BACK BUTTON
 - FIX LOCATION INFO (when they’re all clumped together)
 - EMAIL THOSE PEOPLE ABOUT THE DOTS BEING BEHIND THE MAP SOMETIMES. WHAT'S UP WITH THAT?
+- ADD TIME STAMP FOR WHEN IT IS UPDATED IN ABOUT TAB?
 
 
