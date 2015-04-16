@@ -1,3 +1,8 @@
+/**
+ * borrowed from program by Anna Young (Yale College '16) and Design by Peter Hirsch (MEM '15 candidate)
+ * @ http://epi.yale.edu/visuals/biodiversity-map/
+ */
+
 (function($){
     $.fn.tabSlideOut = function(callerSettings) {
         var settings = $.extend({
