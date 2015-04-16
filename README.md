@@ -57,6 +57,5 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - CREATE BACK BUTTON
 - FIX LOCATION INFO (when they’re all clumped together)
 - EMAIL THOSE PEOPLE ABOUT THE DOTS BEING BEHIND THE MAP SOMETIMES. WHAT'S UP WITH THAT?
-- CHANGE FILES ON SERVER TO OUR NEW ONES
 
 
