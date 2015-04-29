@@ -54,8 +54,8 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - Task: CalendarEvents
 - Triggers: Daily @ 12:00am
 - Actions: Start a program
-	- Program/script: path to python.exe (e.g. C:/Python27/python.exe)
-    - Add arguments (optional): path to python code (e.g. C:/Desktop/ReinEvent.py)
+	- Program/script: path to python.exe (e.g. C:/Python27/ArcGISXX.X/python.exe)
+    - Add arguments: path to python code (e.g. C:/Python27/ReinEvent.py)
 - Create/Update task on Jon's account
   
 ## TO FIX
