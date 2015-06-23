@@ -7,7 +7,7 @@ This is a revamp of the previous map events project for the Smith College Spatia
 
 There are five categories of events that can be viewed: Featured, Student Interest, Lectures and Symposia, Multicultural Events, and Athletic Events.
 
-The visualization can be viewed [here](http://www.science.smith.edu/departments/sal/devel/MappingEvents.html).
+The visualization can be viewed [here](http://www.science.smith.edu/departments/sal/devel/MappedEvents.html).
 
 Feel free to click around and see what is happening on Smith's campus (updated daily). And check out the info below to see how it works!
 
@@ -66,5 +66,3 @@ Feel free to click around and see what is happening on Smith's campus (updated d
 - FIX LOCATION INFO (when they’re all clumped together)
 - EMAIL THOSE PEOPLE ABOUT THE DOTS BEING BEHIND THE MAP SOMETIMES. WHAT'S UP WITH THAT?
 - ADD TIME STAMP FOR WHEN IT IS UPDATED IN ABOUT TAB?
-
-
